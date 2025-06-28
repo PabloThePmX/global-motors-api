@@ -1,0 +1,342 @@
+// Use DBML to define your database structure// Docs: https://dbml.dbdiagram.io/docs
+
+Table cars {
+  id uuid [primary key, default: `gen_random_uuid()`] // DEFAULT gen_random_uuid()
+  price decimal(12,2) [not null]
+  currency currencies [not null]
+  model varchar(255) [not null]
+  year int [not null]
+  car_type car_types [not null]
+  mileage decimal(8,2)
+  brand uuid [ref: > brands.id, not null] 
+  store uuid [ref: > stores.id, not null]
+  worldwide_quantity int
+  national_quantity int
+  color colors [not null]
+  horse_power int [not null]
+  category car_categories [not null]
+  doors int [not null]
+  traction traction_types [not null]
+  car_configuration car_configs [not null]
+  shift shift_types [not null]
+  acceleration_to_hundred decimal(10,2)
+  torque varchar(100)
+  motorization varchar(100)
+  propulsion propulsion_types [not null]
+  is_available boolean [default: true]
+  default_picture varchar(255)
+  last_update_datetime timestamp [default: `now()`]
+}
+
+Table brands {
+  id uuid [primary key, default: `gen_random_uuid()`]
+  name varchar(100) [not null]
+  description varchar(255) 
+  country_origin countries [not null]
+  logo varchar(255) 
+  last_update_datetime timestamp [default: `now()`]
+}
+
+Table stores {
+  id uuid [primary key, default: `gen_random_uuid()`]
+  name varchar(255) [not null]
+  address uuid [ref: > addresses.id] 
+  cnpj varchar(14) [unique, not null]
+  email varchar(150) [not null]
+  phone_number varchar(11)
+  website varchar(255)
+  description varchar(255) 
+  owner uuid [ref: > users.id, not null] 
+  is_active boolean [not null]
+  last_update_datetime timestamp [default: `now()`]
+}
+
+Table addresses { 
+  id uuid [primary key, default: `gen_random_uuid()`]
+  street varchar(150) [not null]
+  number int [not null]
+  neighborhood varchar(100) [not null]
+  city varchar(100) [not null]
+  state br_states [not null]
+  postal_code varchar(9) [not null]
+  complement varchar(150)
+  reference_point varchar(100)
+}
+
+Table shipping {
+  id uuid [primary key, default: `gen_random_uuid()`]
+  shipping_price decimal(10,2) [not null]
+  shipping_address uuid [ref: > archived_addresses.id, not null]
+  order uuid [ref: > orders.id, not null]
+  tracking varchar(40) [not null]
+  estimated_delivery date [not null]
+  delivered_at date
+  last_update_datetime timestamp [default: `now()`]
+}
+
+Table favorite_cars {
+  user uuid [primary key, ref: > users.id]
+  car uuid [primary key, ref: > cars.id]
+  last_update_datetime timestamp [default: `now()`]
+}
+
+Table car_images {
+  car uuid [primary key, ref: > cars.id]
+  id int [primary key, increment]
+  image varchar(255) [not null]
+}
+
+Table cart_items {
+  user uuid [primary key, ref: > users.id]
+  car uuid [primary key, ref: > cars.id]
+  last_update_datetime timestamp [default: `now()`]
+}
+
+Table orders {
+  id uuid [primary key, default: `gen_random_uuid()`]
+  order_number varchar(20) [unique, not null]
+  final_price decimal(12,2) [not null]
+  buyer uuid [ref: > users.id, not null]
+  status transaction_status [not null]
+  delivered boolean
+  payment_type payment_types [not null]
+  last_update_datetime timestamp [default: `now()`]
+}
+
+Table order_items {
+  order uuid [primary key, ref: > orders.id]
+  car uuid [primary key, ref: > archived_cars.id]
+}
+
+Table users {
+  id uuid [primary key, default: `gen_random_uuid()`]
+  email varchar(150) [not null]
+  password varchar(100) [not null]
+  role user_roles [not null]
+  phone_number varchar(11) 
+  first_name varchar(50) [not null]
+  last_name varchar(50) [not null]
+  birthday date [not null]
+  document_number varchar(14) [unique, not null]
+  document_type document_types [not null]
+  gender genders [not null]
+  picture varchar(255)
+  //Pode ser nulo, pq pode ser que o address seja criado depois apenas
+  current_address uuid [ref: > addresses.id]
+  last_update_datetime timestamp [default: `now()`]
+}
+
+Table user_settings {
+  user uuid [primary key, ref: > users.id]
+  language languages [default: "PT-BR"]
+  displayed_currency currencies [default: "USD"]
+  last_update_datetime timestamp [default: `now()`]
+}
+
+//nao vai ser exposto
+//vai alimentar via trigger, com uma replica da tabela de carro da compra
+Table archived_cars {
+  id uuid [primary key]
+  price decimal(12,2) [not null]
+  currency currencies [not null]
+  model varchar(255) [not null]
+  year int [not null]
+  car_type car_types [not null]
+  mileage decimal(8,2)
+  brand uuid [ref: > archived_brands.id, not null] 
+  store uuid [ref: > archived_stores.id, not null]
+  worldwide_quantity int
+  national_quantity int
+  color colors [not null]
+  horse_power int [not null]
+  category car_categories [not null]
+  doors int [not null]
+  traction traction_types [not null]
+  car_configuration car_configs [not null]
+  shift shift_types [not null]
+  acceleration_to_hundred decimal(10,2)
+  torque varchar(100)
+  motorization varchar(100)
+  propulsion propulsion_types [not null]
+  is_available boolean
+  default_picture varchar(255)
+  last_update_datetime timestamp
+}
+
+Table archived_brands {
+  id uuid [primary key]
+  name varchar(100) [not null]
+  description varchar(255) 
+  country_origin countries [not null]
+  logo varchar(255) 
+  last_update_datetime timestamp
+}
+
+Table archived_stores {
+  id uuid [primary key]
+  name varchar(255) [not null]
+  address uuid [ref: > archived_addresses.id] 
+  cnpj varchar(14) [unique, not null]
+  email varchar(150) [not null]
+  phone_number varchar(11)
+  website varchar(255)
+  description varchar(255) 
+  owner uuid [ref: > users.id, not null] 
+  is_active boolean [not null]
+  last_update_datetime timestamp
+}
+
+Table archived_addresses { 
+  id uuid [primary key]
+  street varchar(150) [not null]
+  number int [not null]
+  neighborhood varchar(100) [not null]
+  city varchar(100) [not null]
+  state br_states [not null]
+  postal_code varchar(9) [not null]
+  complement varchar(150)
+  reference_point varchar(100)
+}
+
+//exposto para buscar info
+Table system_info {
+  id integer [primary key, Default: 1]
+  version varchar
+}
+
+Table conversion_rate {
+  currency currencies [primary key]
+  rate decimal(5,2)
+  last_update_datetime timestamp
+}
+
+//=========================ENUMS
+Enum payment_types {
+  "Transferência Bancária"
+  Débito
+  Pix 
+  Boleto
+}
+
+Enum currencies {
+  USD
+  EUR
+  BRL
+}
+
+Enum car_types {
+  Novo
+  Clássico
+} 
+
+Enum traction_types {
+  Traseira
+  Dianteira
+  4x4
+}
+
+Enum car_categories {
+  Esportivo
+  SUV
+  Clássico
+  "Pick-up"
+  Elétrico
+}
+
+Enum languages {
+  "PT-BR"
+  "EN-US"
+  "IT-IT"
+}
+
+Enum colors {
+  Red
+  White
+  Black
+  Blue
+  Green
+}
+
+Enum transaction_status {
+  "Aguardando pagamento"
+  "Problema no pagamento"
+  "Pagamento confirmado"
+  "Carro em preparação"
+  "Carro a caminho"
+  "Entregue"
+  "Falha na entrega"
+}
+
+Enum document_types {
+  Física
+  Jurídica
+}
+
+Enum user_roles {
+  Admin
+  Normal
+  Owner
+}
+
+Enum genders {
+  Masculino
+  Feminino
+  "Não Informar"
+}
+
+Enum car_configs {
+  Coupé
+  Sedan
+  Hatchback
+}
+
+Enum shift_types {
+  Automático
+  Manual
+  "Semi-Automático"
+}
+
+Enum propulsion_types {
+  Gasolina
+  Diesel
+  Híbrida
+  Elétrico
+}
+
+Enum countries {
+  BR
+  IT
+  US
+  DE
+  FR
+}
+
+Enum br_states {
+  AC
+  AL
+  AM
+  AP
+  BA
+  CE
+  DF
+  ES
+  GO
+  MA
+  MG
+  MS
+  MT
+  PA
+  PB
+  PE
+  PI
+  PR
+  RJ
+  RN
+  RO
+  RR
+  RS
+  SC
+  SE
+  SP
+  TO
+}
