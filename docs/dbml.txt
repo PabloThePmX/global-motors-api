@@ -63,7 +63,7 @@ Table addresses {
   reference_point varchar(100)
 }
 
-Table shipping {
+Table shippings {
   id uuid [primary key, default: `gen_random_uuid()`]
   shipping_price decimal(10,2) [not null]
   shipping_address uuid [ref: > archived_addresses.id, not null]

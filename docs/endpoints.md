@@ -54,11 +54,11 @@
 ### Order Items
 - **GET** `/orders/{id_pedido}/items` - Retorna os itens do pedido
 
-### Shipping
-- **GET** `orders/shipping/{id_frete}` - Busca por algum frete
-- **POST** `/orders/shipping/` - Cria um novo frete (vai usar o endereço salvo na tabela do usuário)
+### Shippings
+- **GET** `orders/shippings/{id_frete}` - Busca por algum frete
+- **POST** `/orders/shippings/` - Cria um novo frete (vai usar o endereço salvo na tabela do usuário)
   - *Pode deixar que em um primeiro momento, o backend vai criar o frete*.
-- **PUT** `/orders/shipping/{id_frete}` - Atualiza o frete (status, se já foi entregue, etc) 
+- **PUT** `/orders/shippings/{id_frete}` - Atualiza o frete (status, se já foi entregue, etc) 
 
 ### Cart
 - **GET** `/orders/cart/{id_usuario}` - Listar todos os itens do carrinho do usuário do ID 

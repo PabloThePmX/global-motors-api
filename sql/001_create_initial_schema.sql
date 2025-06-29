@@ -191,7 +191,7 @@ CREATE TABLE "addresses" (
   "reference_point" varchar(100)
 );
 
-CREATE TABLE "shipping" (
+CREATE TABLE "shippings" (
   "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "shipping_price" decimal(10,2) NOT NULL,
   "shipping_address" uuid NOT NULL,
