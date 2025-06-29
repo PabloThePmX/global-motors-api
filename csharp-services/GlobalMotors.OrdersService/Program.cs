@@ -66,6 +66,8 @@ app.MapPost("/orders", async ([FromBody] OrderDTO order) =>
     if (newOrder == null)
         return Results.Problem();
 
+    //TODO: CHAMA O ADDRESS PEGANDO O ID DO CURRENT ADDRESS DO USUARIO DA ORDEM 
+
     await context.SaveChangesAsync();
 
     return Results.Ok(newOrder.Entity.Id);
@@ -111,7 +113,6 @@ app.MapGet("orders/shippings/{id}", async (Guid id) =>
 })
 .WithTags("Shippings");
 
-
 app.MapPost("/orders/shippings", async ([FromBody] ShippingDTO shipping) =>
 {
     var newShipping = await context.Shippings.AddAsync(MapDtoToShipping(shipping));
@@ -147,6 +148,46 @@ app.MapPut("/orders/shippings/{id}", async (Guid id, [FromBody] Shipping shippin
 #endregion
 
 #region Cart
+
+app.MapGet("/orders/cart/{id_usuario}", async (Guid usuarioId) =>
+{
+    var cartItems = await context.CartItems.Where(x => x.User == usuarioId).Select(x => x.Car).ToListAsync();
+
+    return cartItems == null ? Results.NotFound() : Results.Ok(cartItems);
+})
+.WithDescription("Retorna apenas os itens do carrinho do usuário.")
+.WithTags("Carts");
+
+app.MapPost("/orders/cart", async ([FromBody] CartItem cartItem) =>
+{
+    var newCartItem = await context.CartItems.AddAsync(cartItem);
+
+    if (newCartItem == null)
+        return Results.Problem();
+
+    await context.SaveChangesAsync();
+
+    return Results.Ok();
+})
+.WithTags("Carts");
+
+app.MapDelete("/orders/cart/{id_usuario}/{id_carro}", async (Guid idUsuario, Guid idCarro) =>
+{
+    var cartItem = await context.CartItems.FindAsync(idUsuario, idCarro);
+
+    if (cartItem == null)
+        return Results.NotFound();
+
+    if (cartItem.User != idUsuario || cartItem.Car != idCarro)
+        return Results.BadRequest();
+
+    context.CartItems.Remove(cartItem);
+
+    await context.SaveChangesAsync();
+
+    return Results.Ok();
+})
+.WithTags("Carts");
 
 #endregion
 
