@@ -346,9 +346,9 @@ ALTER TABLE "stores" ADD FOREIGN KEY ("address") REFERENCES "addresses" ("id");
 
 ALTER TABLE "stores" ADD FOREIGN KEY ("owner") REFERENCES "users" ("id");
 
-ALTER TABLE "shipping" ADD FOREIGN KEY ("shipping_address") REFERENCES "archived_addresses" ("id");
+ALTER TABLE "shippings" ADD FOREIGN KEY ("shipping_address") REFERENCES "archived_addresses" ("id");
 
-ALTER TABLE "shipping" ADD FOREIGN KEY ("order") REFERENCES "orders" ("id");
+ALTER TABLE "shippings" ADD FOREIGN KEY ("order") REFERENCES "orders" ("id");
 
 ALTER TABLE "favorite_cars" ADD FOREIGN KEY ("user") REFERENCES "users" ("id");
 
