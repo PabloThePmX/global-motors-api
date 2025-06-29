@@ -61,6 +61,8 @@ app.MapGet("/orders/{usuarioId}", async ([FromRoute] Guid usuarioId) =>
 
 app.MapPost("/orders", async ([FromBody] OrderDTO order) =>
 {
+    #region Create Order
+
     var newOrder = await context.Orders.AddAsync(MapDtoToOrder(order));
 
     if (newOrder == null)
@@ -68,6 +70,10 @@ app.MapPost("/orders", async ([FromBody] OrderDTO order) =>
 
     //precisa para criar o id e usa-lo depois
     await context.SaveChangesAsync();
+
+    #endregion
+
+    #region Add cars of the cart in the cars of the new order
 
     var carItems = await context.CartItems.Where(x => x.User == order.Buyer).Select(x => x.Car).ToListAsync();
 
@@ -81,9 +87,20 @@ app.MapPost("/orders", async ([FromBody] OrderDTO order) =>
 
     await context.OrderItems.AddRangeAsync(OrderItems);
 
-    //TODO: PARA CRIAR O FRETE CHAMA O ADDRESS PEGANDO O ID DO CURRENT ADDRESS DO USUARIO DA ORDEM 
-
     await context.SaveChangesAsync();
+
+    #endregion
+
+    #region Create Shipping
+    //TODO: PARA CRIAR O FRETE CHAMA O ADDRESS PEGANDO O ID DO CURRENT ADDRESS DO USUARIO DA ORDEM 
+    #endregion
+
+    #region Delete cars from user's cart
+
+    context.CartItems.RemoveRange(await context.CartItems.Where(x => x.User == order.Buyer).ToListAsync());
+    await context.SaveChangesAsync();
+
+    #endregion
 
     return Results.Ok(newOrder.Entity.Id);
 })
