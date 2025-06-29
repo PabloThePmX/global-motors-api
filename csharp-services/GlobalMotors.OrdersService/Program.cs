@@ -50,7 +50,7 @@ app.UseHttpsRedirection();
 
 #region Orders
 
-app.MapGet("/orders/{id_usuario}", async (Guid usuarioId) =>
+app.MapGet("/orders/{usuarioId}", async ([FromRoute] Guid usuarioId) =>
 {
     var order = await context.Orders.Where(x => x.Buyer == usuarioId).FirstOrDefaultAsync();
 
@@ -66,7 +66,22 @@ app.MapPost("/orders", async ([FromBody] OrderDTO order) =>
     if (newOrder == null)
         return Results.Problem();
 
-    //TODO: CHAMA O ADDRESS PEGANDO O ID DO CURRENT ADDRESS DO USUARIO DA ORDEM 
+    //precisa para criar o id e usa-lo depois
+    await context.SaveChangesAsync();
+
+    var carItems = await context.CartItems.Where(x => x.User == order.Buyer).Select(x => x.Car).ToListAsync();
+
+    if (carItems == null)
+        return Results.BadRequest("Não existem itens no carrinho do usuário. O pedido foi criado vazio.");
+
+    var OrderItems = new List<OrderItem>();
+    carItems.ForEach(car => 
+        OrderItems.Add(new OrderItem() { Car = car, Order = newOrder.Entity.Id }
+    ));
+
+    await context.OrderItems.AddRangeAsync(OrderItems);
+
+    //TODO: PARA CRIAR O FRETE CHAMA O ADDRESS PEGANDO O ID DO CURRENT ADDRESS DO USUARIO DA ORDEM 
 
     await context.SaveChangesAsync();
 
@@ -74,7 +89,7 @@ app.MapPost("/orders", async ([FromBody] OrderDTO order) =>
 })
 .WithTags("Orders");
 
-app.MapPut("/orders/{id}", async (Guid id, [FromBody] Order order) =>
+app.MapPut("/orders/{id}", async ([FromRoute] Guid id, [FromBody] Order order) =>
 {
     var oldOrder = await context.Orders.FindAsync(id);
 
@@ -92,10 +107,14 @@ app.MapPut("/orders/{id}", async (Guid id, [FromBody] Order order) =>
 })
 .WithTags("Orders");
 
-//TODO: FALTA TESTAR
-app.MapGet("/orders/{id}/items", async (Guid id) =>
+app.MapGet("/orders/{id}/items", async ([FromRoute] Guid id) =>
 {
-    var orderItems = await context.OrderItems.FindAsync(id);
+    var order = await context.Orders.FindAsync(id);
+
+    if(order == null)
+        return Results.NotFound();
+
+    var orderItems = await context.OrderItems.Where(x => x.Order == order.Id).Select(x => x.Car).ToListAsync();
 
     return orderItems == null ? Results.NotFound() : Results.Ok(orderItems);
 })
@@ -105,7 +124,7 @@ app.MapGet("/orders/{id}/items", async (Guid id) =>
 
 # region Shipping
 
-app.MapGet("orders/shippings/{id}", async (Guid id) =>
+app.MapGet("orders/shippings/{id}", async ([FromRoute] Guid id) =>
 {
     var shipping = await context.Shippings.FindAsync(id);
 
@@ -127,7 +146,7 @@ app.MapPost("/orders/shippings", async ([FromBody] ShippingDTO shipping) =>
 .WithTags("Shippings")
 .WithDescription("Pode deixar que em um primeiro momento, o backend vai criar o frete.");
 
-app.MapPut("/orders/shippings/{id}", async (Guid id, [FromBody] Shipping shipping) =>
+app.MapPut("/orders/shippings/{id}", async ([FromRoute] Guid id, [FromBody] Shipping shipping) =>
 {
     var oldShipping = await context.Shippings.FindAsync(id);
 
@@ -149,7 +168,7 @@ app.MapPut("/orders/shippings/{id}", async (Guid id, [FromBody] Shipping shippin
 
 #region Cart
 
-app.MapGet("/orders/cart/{id_usuario}", async (Guid usuarioId) =>
+app.MapGet("/orders/cart/{usuarioId}", async ([FromRoute] Guid usuarioId) =>
 {
     var cartItems = await context.CartItems.Where(x => x.User == usuarioId).Select(x => x.Car).ToListAsync();
 
@@ -171,14 +190,14 @@ app.MapPost("/orders/cart", async ([FromBody] CartItem cartItem) =>
 })
 .WithTags("Carts");
 
-app.MapDelete("/orders/cart/{id_usuario}/{id_carro}", async (Guid idUsuario, Guid idCarro) =>
+app.MapDelete("/orders/cart/{usuarioId}/{carroId}", async ([FromRoute] Guid usuarioId, [FromRoute] Guid carroId) =>
 {
-    var cartItem = await context.CartItems.FindAsync(idUsuario, idCarro);
+    var cartItem = await context.CartItems.FindAsync(usuarioId, carroId);
 
     if (cartItem == null)
         return Results.NotFound();
 
-    if (cartItem.User != idUsuario || cartItem.Car != idCarro)
+    if (cartItem.User != usuarioId || cartItem.Car != carroId)
         return Results.BadRequest();
 
     context.CartItems.Remove(cartItem);
