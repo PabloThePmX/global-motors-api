@@ -1,0 +1,6 @@
+@GlobalMotors.UsersService_HostAddress = http://localhost:5220
+
+GET {{GlobalMotors.UsersService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
