@@ -153,7 +153,7 @@ CREATE TABLE "cars" (
   "propulsion" propulsion_types NOT NULL,
   "is_available" boolean DEFAULT true,
   "default_picture" varchar(255),
-  "last_update_datetime" timestamp DEFAULT (now())
+  "last_updated" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "brands" (
@@ -162,7 +162,7 @@ CREATE TABLE "brands" (
   "description" varchar(255),
   "country_origin" countries NOT NULL,
   "logo" varchar(255),
-  "last_update_datetime" timestamp DEFAULT (now())
+  "last_updated" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "stores" (
@@ -176,7 +176,7 @@ CREATE TABLE "stores" (
   "description" varchar(255),
   "owner" uuid NOT NULL,
   "is_active" boolean NOT NULL,
-  "last_update_datetime" timestamp DEFAULT (now())
+  "last_updated" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "addresses" (
@@ -199,13 +199,13 @@ CREATE TABLE "shipping" (
   "tracking" varchar(40) NOT NULL,
   "estimated_delivery" date NOT NULL,
   "delivered_at" date,
-  "last_update_datetime" timestamp DEFAULT (now())
+  "last_updated" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "favorite_cars" (
   "user" uuid,
   "car" uuid,
-  "last_update_datetime" timestamp DEFAULT (now()),
+  "last_updated" timestamp DEFAULT (now()),
   PRIMARY KEY ("user", "car")
 );
 
@@ -219,7 +219,7 @@ CREATE TABLE "car_images" (
 CREATE TABLE "cart_items" (
   "user" uuid,
   "car" uuid,
-  "last_update_datetime" timestamp DEFAULT (now()),
+  "last_updated" timestamp DEFAULT (now()),
   PRIMARY KEY ("user", "car")
 );
 
@@ -231,7 +231,7 @@ CREATE TABLE "orders" (
   "status" transaction_status NOT NULL,
   "delivered" boolean,
   "payment_type" payment_types NOT NULL,
-  "last_update_datetime" timestamp DEFAULT (now())
+  "last_updated" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "order_items" (
@@ -254,14 +254,14 @@ CREATE TABLE "users" (
   "gender" genders NOT NULL,
   "picture" varchar(255),
   "current_address" uuid,
-  "last_update_datetime" timestamp DEFAULT (now())
+  "last_updated" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "user_settings" (
   "user" uuid PRIMARY KEY,
   "language" languages DEFAULT 'PT-BR',
   "displayed_currency" currencies DEFAULT 'USD',
-  "last_update_datetime" timestamp DEFAULT (now())
+  "last_updated" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "archived_cars" (
@@ -289,7 +289,7 @@ CREATE TABLE "archived_cars" (
   "propulsion" propulsion_types NOT NULL,
   "is_available" boolean,
   "default_picture" varchar(255),
-  "last_update_datetime" timestamp
+  "last_updated" timestamp
 );
 
 CREATE TABLE "archived_brands" (
@@ -298,7 +298,7 @@ CREATE TABLE "archived_brands" (
   "description" varchar(255),
   "country_origin" countries NOT NULL,
   "logo" varchar(255),
-  "last_update_datetime" timestamp
+  "last_updated" timestamp
 );
 
 CREATE TABLE "archived_stores" (
@@ -312,7 +312,7 @@ CREATE TABLE "archived_stores" (
   "description" varchar(255),
   "owner" uuid NOT NULL,
   "is_active" boolean NOT NULL,
-  "last_update_datetime" timestamp
+  "last_updated" timestamp
 );
 
 CREATE TABLE "archived_addresses" (
@@ -335,7 +335,7 @@ CREATE TABLE "system_info" (
 CREATE TABLE "conversion_rate" (
   "currency" currencies PRIMARY KEY,
   "rate" decimal(5,2),
-  "last_update_datetime" timestamp
+  "last_updated" timestamp
 );
 
 ALTER TABLE "cars" ADD FOREIGN KEY ("brand") REFERENCES "brands" ("id");
