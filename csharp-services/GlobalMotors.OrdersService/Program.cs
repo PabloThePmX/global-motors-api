@@ -5,7 +5,8 @@ using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using GlobalMotors.OrdersService.Models.DTO;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +21,10 @@ builder.Services.AddSwaggerGen(opt =>
         Title = "Orders Service",
         Description = "Documentação da API do Microsserviço Orders, contendo rotas para Pedidos (Orders), Fretes (Shippings) e Carrinhos (Carts).",
     });
-   
+
+    opt.EnableAnnotations();
+    opt.UseInlineDefinitionsForEnums();
+
 });
 builder.Services.AddDbContextFactory<GlobalMotorsContext>(opt => 
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Server=localhost;Port=5432;Database=global_motors;User Id=postgres;Password=postgres;")));
@@ -46,18 +50,18 @@ app.UseHttpsRedirection();
 
 #region Orders
 
-app.MapGet("/orders/{usuario_id}", async (Guid usuario_id) =>
+app.MapGet("/orders/{id_usuario}", async (Guid usuarioId) =>
 {
-    var order = await context.Orders.Where(x => x.Buyer == usuario_id).FirstOrDefaultAsync();
+    var order = await context.Orders.Where(x => x.Buyer == usuarioId).FirstOrDefaultAsync();
 
     return (order == null) ? Results.NotFound() : Results.Ok(order);
 
 })
 .WithTags("Orders");
 
-app.MapPost("/orders", async ([FromBody] Order order) =>
+app.MapPost("/orders", async ([FromBody] OrderDTO order) =>
 {
-    var newOrder = await context.Orders.AddAsync(order);
+    var newOrder = await context.Orders.AddAsync(MapDtoToOrder(order));
 
     if (newOrder == null)
         return Results.Problem();
@@ -98,10 +102,73 @@ app.MapGet("/orders/{id}/items", async (Guid id) =>
 #endregion
 
 # region Shipping
+
+app.MapGet("orders/shippings/{id}", async (Guid id) =>
+{
+    var shipping = await context.Shippings.FindAsync(id);
+
+    return shipping == null ? Results.NotFound() : Results.Ok(shipping);
+})
+.WithTags("Shippings");
+
+
+app.MapPost("/orders/shippings", async ([FromBody] ShippingDTO shipping) =>
+{
+    var newShipping = await context.Shippings.AddAsync(MapDtoToShipping(shipping));
+
+    if (newShipping == null)
+        return Results.Problem();
+
+    await context.SaveChangesAsync();
+
+    return Results.Ok(newShipping.Entity.Id);
+})
+.WithTags("Shippings")
+.WithDescription("Pode deixar que em um primeiro momento, o backend vai criar o frete.");
+
+app.MapPut("/orders/shippings/{id}", async (Guid id, [FromBody] Shipping shipping) =>
+{
+    var oldShipping = await context.Shippings.FindAsync(id);
+
+    if (oldShipping == null)
+        return Results.NotFound();
+
+    if (oldShipping.Id != id)
+        return Results.BadRequest();
+
+    context.Entry(oldShipping).CurrentValues.SetValues(shipping);
+
+    await context.SaveChangesAsync();
+
+    return Results.Ok();
+})
+.WithTags("Shippings");
+
 #endregion
 
 #region Cart
+
 #endregion
+
+Order MapDtoToOrder(OrderDTO order) => new Order 
+{
+    OrderNumber = order.OrderNumber,
+    Buyer = order.Buyer,
+    Delivered = order.Delivered,
+    FinalPrice = order.FinalPrice,
+    PaymentType = order.PaymentType,
+    Status = order.Status
+};
+
+Shipping MapDtoToShipping(ShippingDTO shipping) => new Shipping
+{
+    ShippingPrice = shipping.ShippingPrice,
+    ShippingAddress = shipping.ShippingAddress,
+    Order = shipping.Order,
+    Tracking = shipping.Tracking,
+    EstimatedDelivery = shipping.EstimatedDelivery,
+    DeliveredAt = shipping.DeliveredAt
+};
 
 app.Run();
 

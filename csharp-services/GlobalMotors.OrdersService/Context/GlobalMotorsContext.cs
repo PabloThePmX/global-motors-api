@@ -111,7 +111,8 @@ public partial class GlobalMotorsContext : DbContext
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("last_updated");
             entity.Property(e => e.Order).HasColumnName("order");
-            entity.Property(e => e.ShippingAddress).HasColumnName("shipping_address");
+            entity.Property(e => e.ShippingAddress)
+                .HasColumnName("shipping_address");
             entity.Property(e => e.ShippingPrice)
                 .HasPrecision(10, 2)
                 .HasColumnName("shipping_price");
