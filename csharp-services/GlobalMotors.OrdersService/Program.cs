@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 using GlobalMotors.OrdersService.Models.DTO;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Steeltoe.Discovery.Client;
+using GlobalMotors.OrdersService.Models.Enums;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,8 +28,17 @@ builder.Services.AddSwaggerGen(opt =>
     opt.UseInlineDefinitionsForEnums();
 
 });
-builder.Services.AddDbContextFactory<GlobalMotorsContext>(opt => 
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("Server=localhost;Port=5432;Database=global_motors;User Id=postgres;Password=postgres;")));
+
+builder.Services.AddDbContextFactory<GlobalMotorsContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), en =>
+    {
+        en.MapEnum<PaymentTypes>(enumName: "payment_types");
+        en.MapEnum<TransactionStatus>(enumName: "transaction_status");
+    })
+);
+
+builder.Services.AddDiscoveryClient(builder.Configuration);
+builder.Services.AddHealthChecks();
 
 builder.Services.Configure<JsonOptions>(opt =>
 {
@@ -40,19 +51,17 @@ var scope = app.Services.CreateScope();
 var context = scope.ServiceProvider.GetRequiredService<GlobalMotorsContext>();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseHealthChecks("/health");
 
 app.UseHttpsRedirection();
 
 #region Orders
 
-app.MapGet("/orders/{usuarioId}", async ([FromRoute] Guid usuarioId) =>
+app.MapGet("/orders/{userId}", async ([FromRoute] Guid userId) =>
 {
-    var order = await context.Orders.Where(x => x.Buyer == usuarioId).FirstOrDefaultAsync();
+    var order = await context.Orders.Where(x => x.Buyer == userId).FirstOrDefaultAsync();
 
     return (order == null) ? Results.NotFound() : Results.Ok(order);
 
@@ -185,9 +194,9 @@ app.MapPut("/orders/shippings/{id}", async ([FromRoute] Guid id, [FromBody] Ship
 
 #region Cart
 
-app.MapGet("/orders/cart/{usuarioId}", async ([FromRoute] Guid usuarioId) =>
+app.MapGet("/orders/cart/{userId}", async ([FromRoute] Guid userId) =>
 {
-    var cartItems = await context.CartItems.Where(x => x.User == usuarioId).Select(x => x.Car).ToListAsync();
+    var cartItems = await context.CartItems.Where(x => x.User == userId).Select(x => x.Car).ToListAsync();
 
     return cartItems == null ? Results.NotFound() : Results.Ok(cartItems);
 })
@@ -207,14 +216,14 @@ app.MapPost("/orders/cart", async ([FromBody] CartItem cartItem) =>
 })
 .WithTags("Carts");
 
-app.MapDelete("/orders/cart/{usuarioId}/{carroId}", async ([FromRoute] Guid usuarioId, [FromRoute] Guid carroId) =>
+app.MapDelete("/orders/cart/{userId}/{carId}", async ([FromRoute] Guid userId, [FromRoute] Guid carId) =>
 {
-    var cartItem = await context.CartItems.FindAsync(usuarioId, carroId);
+    var cartItem = await context.CartItems.FindAsync(userId, carId);
 
     if (cartItem == null)
         return Results.NotFound();
 
-    if (cartItem.User != usuarioId || cartItem.Car != carroId)
+    if (cartItem.User != userId || cartItem.Car != carId)
         return Results.BadRequest();
 
     context.CartItems.Remove(cartItem);

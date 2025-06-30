@@ -1,5 +1,4 @@
-﻿using GlobalMotors.OrdersService.Helpers;
-using NpgsqlTypes;
+﻿using NpgsqlTypes;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
