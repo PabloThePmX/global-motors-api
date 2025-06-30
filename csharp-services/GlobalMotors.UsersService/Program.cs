@@ -21,7 +21,7 @@ builder.Services.AddSwaggerGen(opt =>
     {
         Version = "v1",
         Title = "Users Service",
-        Description = "Documentação da API do Microsserviço Users, contendo rotas para Configuração do Usuário (User Settings) e Favoritos (User Favorites).",
+        Description = "Documentaï¿½ï¿½o da API do Microsserviï¿½o Users, contendo rotas para Configuraï¿½ï¿½o do Usuï¿½rio (User Settings) e Favoritos (User Favorites).",
     });
 
     //opt.EnableAnnotations();
@@ -70,7 +70,7 @@ app.MapGet("/users/user-settings/{userId}", async ([FromRoute] Guid userId) =>
 app.MapPost("/users/user-settings/", async ([FromBody] UserSetting settings) =>
 {
     if (context.UserSettings.Where(x => x.User == settings.User).Any())
-        return Results.BadRequest("Usuáio já possui configurações.");
+        return Results.BadRequest("Usuï¿½io jï¿½ possui configuraï¿½ï¿½es.");
 
     var newSettings = await context.UserSettings.AddAsync(settings);
 
