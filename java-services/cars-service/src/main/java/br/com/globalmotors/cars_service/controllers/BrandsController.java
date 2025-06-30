@@ -27,13 +27,13 @@ public class BrandsController {
 	public BrandsController(BrandsRepo brandsRepo) {
 		this.brandsRepo = brandsRepo;
 	}
-	
+	@GetMapping("/") //Retorna todos os dados
 	public ResponseEntity<List<BrandEntity>> getAll() {
 		List<BrandEntity> brands = brandsRepo.findAll();
 		return ResponseEntity.ok(brands);
 	}
 	
-    @GetMapping("/{brandId}")
+    @GetMapping("/{brandId}") //Retorna a marca com tal id
     public ResponseEntity<BrandEntity> getById(@PathVariable("brandId") UUID id) throws Exception {
         BrandEntity brand = brandsRepo.findById(id)
                 .orElseThrow(() -> new Exception("Marca não encontrada."));
@@ -41,7 +41,7 @@ public class BrandsController {
         return ResponseEntity.ok(brand);
     }
 
-    @PostMapping
+    @PostMapping //Cria marca
     public ResponseEntity<BrandEntity> create(@RequestBody BrandDTO newBrand) {
     	var completeBrand = new BrandEntity();
     	BeanUtils.copyProperties(newBrand, completeBrand);
@@ -49,7 +49,7 @@ public class BrandsController {
         return ResponseEntity.created(URI.create("/cars/brands/" + saved.getId())).body(saved);
     }
     
-    @PutMapping("/{brandId}")
+    @PutMapping("/{brandId}") //Atualiza uma marca
     public ResponseEntity<BrandEntity> update(@PathVariable("brandId") UUID id, @RequestBody BrandEntity updatedBrand) throws Exception {
         BrandEntity existingBrand = brandsRepo.findById(id)
             .orElseThrow(() -> new Exception("Marca não encontrada."));

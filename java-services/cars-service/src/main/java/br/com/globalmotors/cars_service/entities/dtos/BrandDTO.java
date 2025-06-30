@@ -25,6 +25,8 @@ public class BrandDTO {
 
     @Column(name = "logo")
     private String logo;
+    
+    //Getters and Setters
 
 	public String getName() {
 		return name;

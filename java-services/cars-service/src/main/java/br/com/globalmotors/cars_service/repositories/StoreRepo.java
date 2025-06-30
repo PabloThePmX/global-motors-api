@@ -5,9 +5,9 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import br.com.globalmotors.cars_service.entities.CarEntity;
+import br.com.globalmotors.cars_service.entities.StoreEntity;
 
 @Repository
-public interface CarsRepo extends JpaRepository<CarEntity, UUID>{
-	
+public interface StoreRepo extends JpaRepository<StoreEntity, UUID>{
+
 }
