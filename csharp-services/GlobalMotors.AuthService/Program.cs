@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Tokens.Experimental;
 using Microsoft.OpenApi.Models;
+using Steeltoe.Discovery.Client;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -35,7 +36,17 @@ builder.Services.AddSwaggerGen(opt =>
 });
 
 builder.Services.AddDbContextFactory<GlobalMotorsContext>(opt =>
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("Server=localhost;Port=5432;Database=global_motors;User Id=postgres;Password=postgres;")));
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), en =>
+    {
+        en.MapEnum<BrStates>(enumName: "br_states");
+        en.MapEnum<DocumentTypes>(enumName: "document_types");
+        en.MapEnum<Genders>(enumName: "genders");
+        en.MapEnum<UserRoles>(enumName: "user_roles");
+    })
+);
+
+builder.Services.AddDiscoveryClient(builder.Configuration);
+builder.Services.AddHealthChecks();
 
 builder.Services.Configure<JsonOptions>(opt =>
 {
@@ -48,11 +59,9 @@ var scope = app.Services.CreateScope();
 var context = scope.ServiceProvider.GetRequiredService<GlobalMotorsContext>();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseHealthChecks("/health");
 
 app.UseHttpsRedirection();
 
