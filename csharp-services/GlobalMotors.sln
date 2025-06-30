@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35919.96 d17.13
+VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlobalMotors.UsersService", "GlobalMotors.UsersService\GlobalMotors.UsersService.csproj", "{BAB076DE-5D1E-47F6-AFAF-A237AFA77ECF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlobalMotors.OrdersService", "GlobalMotors.OrdersService\GlobalMotors.OrdersService.csproj", "{9998A08B-DB46-444C-8D7F-BEF896B43DB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlobalMotors.AuthService", "GlobalMotors.AuthService\GlobalMotors.AuthService.csproj", "{5F1E2339-EEC1-42B3-A274-A820CEA0894E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{9998A08B-DB46-444C-8D7F-BEF896B43DB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9998A08B-DB46-444C-8D7F-BEF896B43DB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9998A08B-DB46-444C-8D7F-BEF896B43DB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F1E2339-EEC1-42B3-A274-A820CEA0894E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F1E2339-EEC1-42B3-A274-A820CEA0894E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F1E2339-EEC1-42B3-A274-A820CEA0894E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F1E2339-EEC1-42B3-A274-A820CEA0894E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
