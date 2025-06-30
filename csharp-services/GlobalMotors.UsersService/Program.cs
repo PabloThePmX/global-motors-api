@@ -21,7 +21,7 @@ builder.Services.AddSwaggerGen(opt =>
     {
         Version = "v1",
         Title = "Users Service",
-        Description = "Documenta��o da API do Microsservi�o Users, contendo rotas para Configura��o do Usu�rio (User Settings) e Favoritos (User Favorites).",
+        Description = "Documentação da API do Microsserviço Users, contendo rotas para Configuração do Usuário (User Settings) e Favoritos (User Favorites).",
     });
 
     //opt.EnableAnnotations();
