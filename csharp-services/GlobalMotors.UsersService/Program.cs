@@ -1,10 +1,12 @@
 using GlobalMotors.UsersService.Context;
 using GlobalMotors.UsersService.Models;
+using GlobalMotors.UsersService.Models.Enums;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Steeltoe.Discovery.Client;
 using System.Text.Json.Serialization;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
@@ -26,8 +28,17 @@ builder.Services.AddSwaggerGen(opt =>
     opt.UseInlineDefinitionsForEnums();
 
 });
+
 builder.Services.AddDbContextFactory<GlobalMotorsContext>(opt =>
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("Server=localhost;Port=5432;Database=global_motors;User Id=postgres;Password=postgres;")));
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), en =>
+    {
+        en.MapEnum<Currencies>(enumName: "currencies");
+        en.MapEnum<Languages>(enumName: "languages");
+    })
+);
+
+builder.Services.AddDiscoveryClient(builder.Configuration);
+builder.Services.AddHealthChecks();
 
 builder.Services.Configure<JsonOptions>(opt =>
 {
@@ -40,19 +51,17 @@ var scope = app.Services.CreateScope();
 var context = scope.ServiceProvider.GetRequiredService<GlobalMotorsContext>();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseHealthChecks("/health");
 
 app.UseHttpsRedirection();
 
 # region User Settings and System Info
 
-app.MapGet("/users/user-settings/{usuarioId}", async ([FromRoute] Guid usuarioId) =>
+app.MapGet("/users/user-settings/{userId}", async ([FromRoute] Guid userId) =>
 {
-    var settings = await context.UserSettings.FindAsync(usuarioId);
+    var settings = await context.UserSettings.FindAsync(userId);
 
     return settings == null ? Results.NotFound() : Results.Ok(settings);
 })
@@ -74,14 +83,14 @@ app.MapPost("/users/user-settings/", async ([FromBody] UserSetting settings) =>
 })
 .WithTags("User Settings");
 
-app.MapPut("/users/user-settings/{usuarioId}", async ([FromRoute] Guid usuarioId, [FromBody] UserSetting settings) =>
+app.MapPut("/users/user-settings/{userId}", async ([FromRoute] Guid userId, [FromBody] UserSetting settings) =>
 {
-    var oldSettings = await context.UserSettings.FindAsync(usuarioId);
+    var oldSettings = await context.UserSettings.FindAsync(userId);
 
     if (oldSettings == null)
         return Results.NotFound();
 
-    if (oldSettings.User != usuarioId)
+    if (oldSettings.User != userId)
         return Results.BadRequest();
 
     context.Entry(oldSettings).CurrentValues.SetValues(settings);
@@ -104,9 +113,9 @@ app.MapGet("/users/system-info", async () =>
 
 #region User Favorites
 
-app.MapGet("/users/user-favorites/{usuarioId}", async ([FromRoute] Guid usuarioId) =>
+app.MapGet("/users/user-favorites/{userId}", async ([FromRoute] Guid userId) =>
 {
-    var userFavorites = await context.FavoriteCars.Where(x => x.User == usuarioId).Select(x => x.Car).ToListAsync();
+    var userFavorites = await context.FavoriteCars.Where(x => x.User == userId).Select(x => x.Car).ToListAsync();
 
     return userFavorites == null ? Results.NotFound() : Results.Ok(userFavorites);
 })
@@ -125,14 +134,14 @@ app.MapPost("/users/user-favorites", async ([FromBody] FavoriteCar favoriteCar) 
 })
 .WithTags("User Favorites");
 
-app.MapDelete("/users/user-favorites/{usuarioId}/{carroId}", async ([FromRoute] Guid usuarioId, [FromRoute] Guid carroId) =>
+app.MapDelete("/users/user-favorites/{userId}/{carroId}", async ([FromRoute] Guid userId, [FromRoute] Guid carroId) =>
 {
-    var favoriteCar = await context.FavoriteCars.FindAsync(usuarioId, carroId);
+    var favoriteCar = await context.FavoriteCars.FindAsync(userId, carroId);
 
     if (favoriteCar == null)
         return Results.NotFound();
 
-    if (favoriteCar.User != usuarioId || favoriteCar.Car != carroId)
+    if (favoriteCar.User != userId || favoriteCar.Car != carroId)
         return Results.BadRequest();
 
     context.FavoriteCars.Remove(favoriteCar);
