@@ -102,14 +102,47 @@ app.MapGet("/users/system-info", async () =>
 
 #endregion
 
-//#region User Favorites
+#region User Favorites
 
-//app.MapGet();
+app.MapGet("/users/user-favorites/{usuarioId}", async ([FromRoute] Guid usuarioId) =>
+{
+    var userFavorites = await context.FavoriteCars.Where(x => x.User == usuarioId).Select(x => x.Car).ToListAsync();
 
-//app.MapPost();
+    return userFavorites == null ? Results.NotFound() : Results.Ok(userFavorites);
+})
+.WithTags("User Favorites");
 
-//app.MapDelete();
+app.MapPost("/users/user-favorites", async ([FromBody] FavoriteCar favoriteCar) =>
+{
+    var newFavorite = await context.FavoriteCars.AddAsync(favoriteCar);
 
-//#endregion
+    if (newFavorite == null)
+        return Results.Problem();
+
+    await context.SaveChangesAsync();
+
+    return Results.Ok();
+})
+.WithTags("User Favorites");
+
+app.MapDelete("/users/user-favorites/{usuarioId}/{carroId}", async ([FromRoute] Guid usuarioId, [FromRoute] Guid carroId) =>
+{
+    var favoriteCar = await context.FavoriteCars.FindAsync(usuarioId, carroId);
+
+    if (favoriteCar == null)
+        return Results.NotFound();
+
+    if (favoriteCar.User != usuarioId || favoriteCar.Car != carroId)
+        return Results.BadRequest();
+
+    context.FavoriteCars.Remove(favoriteCar);
+
+    await context.SaveChangesAsync();
+
+    return Results.Ok();
+})
+.WithTags("User Favorites");
+
+#endregion
 
 app.Run();
