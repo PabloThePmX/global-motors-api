@@ -37,11 +37,12 @@ CREATE TYPE "languages" AS ENUM (
 );
 
 CREATE TYPE "colors" AS ENUM (
-  'Red',
-  'White',
-  'Black',
-  'Blue',
-  'Green'
+  'Vermelho',
+  'Branco',
+  'Preto',
+  'Azul',
+  'Verde',
+  'Amarelo'
 );
 
 CREATE TYPE "transaction_status" AS ENUM (
@@ -170,7 +171,7 @@ CREATE TABLE "stores" (
   "name" varchar(255) NOT NULL,
   "address" uuid,
   "cnpj" varchar(14) UNIQUE NOT NULL,
-  "email" varchar(150) NOT NULL,
+  "email" varchar(150) UNIQUE NOT NULL,
   "phone_number" varchar(11),
   "website" varchar(255),
   "description" varchar(255),
@@ -242,7 +243,7 @@ CREATE TABLE "order_items" (
 
 CREATE TABLE "users" (
   "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "email" varchar(150) NOT NULL,
+  "email" varchar(150) UNIQUE NOT NULL,
   "password" varchar(100) NOT NULL,
   "role" user_roles NOT NULL,
   "phone_number" varchar(11),
@@ -306,7 +307,7 @@ CREATE TABLE "archived_stores" (
   "name" varchar(255) NOT NULL,
   "address" uuid,
   "cnpj" varchar(14) UNIQUE NOT NULL,
-  "email" varchar(150) NOT NULL,
+  "email" varchar(150) UNIQUE NOT NULL,
   "phone_number" varchar(11),
   "website" varchar(255),
   "description" varchar(255),
