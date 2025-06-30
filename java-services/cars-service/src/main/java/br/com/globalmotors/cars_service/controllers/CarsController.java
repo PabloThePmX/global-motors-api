@@ -7,25 +7,26 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import br.com.globalmotors.cars_service.entities.CarsEntity;
+import br.com.globalmotors.cars_service.entities.CarEntity;
 import br.com.globalmotors.cars_service.repositories.CarsRepo;
 
 @RestController
 @RequestMapping("cars")
-public class OpenCarsController {
+public class CarsController {
 
     private final CarsRepo repo;
 
-    public OpenCarsController(CarsRepo repo) {
+    public CarsController(CarsRepo repo) {
         this.repo = repo;
     }
-
+    
+    /*
     @Value("${server.port}")
     private int serverPort;
 
     @GetMapping
-    public ResponseEntity<List<CarsEntity>> getAll() {
-        List<CarsEntity> cars = repo.findAll();
+    public ResponseEntity<List<CarEntity>> getAll() {
+        List<CarEntity> cars = repo.findAll();
         cars.forEach(car -> {
             car.setEnviroment("Car-Service running on port " + serverPort);
             car.setConvertedPrice(car.getConvertedPrice());
@@ -34,8 +35,8 @@ public class OpenCarsController {
     }
 
     @GetMapping("/{id_carro}")
-    public ResponseEntity<CarsEntity> getById(@PathVariable("id_carro") Long id) throws Exception {
-        CarsEntity car = repo.findById(id)
+    public ResponseEntity<CarEntity> getById(@PathVariable("id_carro") Long id) throws Exception {
+        CarEntity car = repo.findById(id)
                 .orElseThrow(() -> new Exception("Carro não encontrado."));
         car.setEnviroment("Car-Service running on port " + serverPort);
         car.setConvertedPrice(car.getConvertedPrice());
@@ -43,15 +44,15 @@ public class OpenCarsController {
     }
 
     @PostMapping
-    public ResponseEntity<CarsEntity> create(@RequestBody CarsEntity newCar) {
-        CarsEntity saved = repo.save(newCar);
+    public ResponseEntity<CarEntity> create(@RequestBody CarEntity newCar) {
+        CarEntity saved = repo.save(newCar);
         return ResponseEntity.created(URI.create("/cars/" + saved.getId())).body(saved);
     }
 
     @PutMapping("/{id_carro}")
-    public ResponseEntity<CarsEntity> update(@PathVariable("id_carro") Long id,
-                                             @RequestBody CarsEntity updatedCar) throws Exception {
-        CarsEntity existing = repo.findById(id)
+    public ResponseEntity<CarEntity> update(@PathVariable("id_carro") Long id,
+                                             @RequestBody CarEntity updatedCar) throws Exception {
+        CarEntity existing = repo.findById(id)
                 .orElseThrow(() -> new Exception("Carro não encontrado para atualização."));
 
         existing.setPrice(updatedCar.getPrice());
@@ -78,7 +79,8 @@ public class OpenCarsController {
         existing.setAvailable(updatedCar.isAvailable());
         existing.setDefaultPicture(updatedCar.getDefaultPicture());
 
-        CarsEntity saved = repo.save(existing);
+        CarEntity saved = repo.save(existing);
         return ResponseEntity.ok(saved);
     }
+    */
 }

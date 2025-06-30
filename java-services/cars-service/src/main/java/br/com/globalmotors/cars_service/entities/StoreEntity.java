@@ -1,39 +1,56 @@
 package br.com.globalmotors.cars_service.entities;
 
-import java.time.LocalDateTime;
+import java.util.UUID;
+
+import org.hibernate.annotations.UuidGenerator;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
-@Table (name = "stores")
+@Table(name = "stores")
 public class StoreEntity {
+	
 	@Id
-	@GeneratedValue
-	private Long id;
-	@Column (name = "name")
-	private String name;
-	@Column (name = "address")
-	private String address;
-	private String cnpj;
-	@Column (name = "cnpj")
-	private String email;
-	@Column (name = "phone_number")
-	private String phone_number;
-	@Column (name = "website")
-	private String website;
-	@Column (name = "description")
-	private String descprition;
-	@Column (name = "owner")
-	private String owner;
-	@Column (name = "is_active")
-	private boolean is_active;
-	@Column (name = "last_update_datetime")
-	private LocalDateTime last_update;
+    @UuidGenerator
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
+
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "address")
+    private UUID address;
+
+    @Column(name = "cnpj", nullable = false)
+    private String cnpj;
+
+    @Column(name = "email", nullable = false)
+    private String email;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "website")
+    private String website;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "owner", nullable = false)
+    private UUID owner;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
 	
 	//Getters and Setters
 	
-	public Long getId() {
+	public UUID getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 	public String getName() {
@@ -42,10 +59,10 @@ public class StoreEntity {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getAddress() {
+	public UUID getAddress() {
 		return address;
 	}
-	public void setAddress(String address) {
+	public void setAddress(UUID address) {
 		this.address = address;
 	}
 	public String getCnpj() {
@@ -60,42 +77,34 @@ public class StoreEntity {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String getPhone_number() {
-		return phone_number;
-	}
-	public void setPhone_number(String phone_number) {
-		this.phone_number = phone_number;
-	}
 	public String getWebsite() {
 		return website;
 	}
 	public void setWebsite(String website) {
 		this.website = website;
 	}
-	public String getDescprition() {
-		return descprition;
+	public String getDescription() {
+		return description;
 	}
-	public void setDescprition(String descprition) {
-		this.descprition = descprition;
+	public void setDescription(String description) {
+		this.description = description;
 	}
-	public String getOwner() {
+	public UUID getOwner() {
 		return owner;
 	}
-	public void setOwner(String owner) {
+	public void setOwner(UUID owner) {
 		this.owner = owner;
 	}
-	public boolean isIs_active() {
-		return is_active;
+	public String getPhoneNumber() {
+		return phoneNumber;
 	}
-	public void setIs_active(boolean is_active) {
-		this.is_active = is_active;
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
-	public LocalDateTime getLast_update() {
-		return last_update;
+	public boolean isActive() {
+		return isActive;
 	}
-	public void setLast_update(LocalDateTime last_update) {
-		this.last_update = last_update;
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
 	}
-	
-	
 }
