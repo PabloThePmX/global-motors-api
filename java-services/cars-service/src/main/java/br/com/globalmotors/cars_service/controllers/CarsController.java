@@ -2,13 +2,21 @@ package br.com.globalmotors.cars_service.controllers;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import br.com.globalmotors.cars_service.entities.CarEntity;
+import br.com.globalmotors.cars_service.entities.dtos.CarDTO;
 import br.com.globalmotors.cars_service.repositories.CarsRepo;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
 @RequestMapping("cars")
@@ -20,67 +28,59 @@ public class CarsController {
         this.repo = repo;
     }
     
-    /*
-    @Value("${server.port}")
-    private int serverPort;
-
-    @GetMapping
-    public ResponseEntity<List<CarEntity>> getAll() {
-        List<CarEntity> cars = repo.findAll();
-        cars.forEach(car -> {
-            car.setEnviroment("Car-Service running on port " + serverPort);
-            car.setConvertedPrice(car.getConvertedPrice());
-        });
-        return ResponseEntity.ok(cars);
+    @GetMapping("/")
+    public ResponseEntity<List<CarEntity>>getAll(){
+    	List<CarEntity>cars = repo.findAll();
+    	return ResponseEntity.ok(cars);
     }
-
-    @GetMapping("/{id_carro}")
-    public ResponseEntity<CarEntity> getById(@PathVariable("id_carro") Long id) throws Exception {
-        CarEntity car = repo.findById(id)
-                .orElseThrow(() -> new Exception("Carro não encontrado."));
-        car.setEnviroment("Car-Service running on port " + serverPort);
-        car.setConvertedPrice(car.getConvertedPrice());
-        return ResponseEntity.ok(car);
+    
+    @GetMapping("/id_carro")
+    public ResponseEntity<CarEntity>getById(@PathVariable("carId") UUID Id) throws Exception{
+    	CarEntity car = repo.findById(Id)
+    			.orElseThrow(() -> new Exception("Carro não encontrado."));
+    	
+    	return ResponseEntity.ok(car);
     }
-
+    
     @PostMapping
-    public ResponseEntity<CarEntity> create(@RequestBody CarEntity newCar) {
-        CarEntity saved = repo.save(newCar);
-        return ResponseEntity.created(URI.create("/cars/" + saved.getId())).body(saved);
+    public ResponseEntity<CarEntity>create(@RequestBody CarDTO newCar) {
+    	var completeCar = new CarEntity();
+    	BeanUtils.copyProperties(newCar, completeCar);
+    	CarEntity save = repo.save(completeCar);
+    	return ResponseEntity.created(URI.create("/cars/" + save.getId())).body(save);
     }
-
+    
     @PutMapping("/{id_carro}")
-    public ResponseEntity<CarEntity> update(@PathVariable("id_carro") Long id,
-                                             @RequestBody CarEntity updatedCar) throws Exception {
-        CarEntity existing = repo.findById(id)
-                .orElseThrow(() -> new Exception("Carro não encontrado para atualização."));
-
-        existing.setPrice(updatedCar.getPrice());
-        existing.setCurrency(updatedCar.getCurrency());
-        existing.setModel(updatedCar.getModel());
-        existing.setYear(updatedCar.getYear());
-        existing.setCarType(updatedCar.getCarType());
-        existing.setMileage(updatedCar.getMileage());
-        existing.setBrand(updatedCar.getBrand());
-        existing.setStore(updatedCar.getStore());
-        existing.setWorldwideQuantity(updatedCar.getWorldwideQuantity());
-        existing.setNationalQuantity(updatedCar.getNationalQuantity());
-        existing.setColor(updatedCar.getColor());
-        existing.setHorsePower(updatedCar.getHorsePower());
-        existing.setCategory(updatedCar.getCategory());
-        existing.setDoors(updatedCar.getDoors());
-        existing.setTraction(updatedCar.getTraction());
-        existing.setCarConfiguration(updatedCar.getCarConfiguration());
-        existing.setShift(updatedCar.getShift());
-        existing.setAccelerationToHundred(updatedCar.getAccelerationToHundred());
-        existing.setTorque(updatedCar.getTorque());
-        existing.setMotorization(updatedCar.getMotorization());
-        existing.setPropulsion(updatedCar.getPropulsion());
-        existing.setAvailable(updatedCar.isAvailable());
-        existing.setDefaultPicture(updatedCar.getDefaultPicture());
-
-        CarEntity saved = repo.save(existing);
-        return ResponseEntity.ok(saved);
+    public ResponseEntity<CarEntity>update(@PathVariable("carId") UUID Id, @RequestBody CarEntity updatedCar) throws Exception {
+    	CarEntity existingCar = repo.findById(Id)
+    			.orElseThrow(() -> new Exception ("Carro não encontrado."));
+    	
+    	existingCar.setPrice(updatedCar.getPrice());
+        existingCar.setCurrency(updatedCar.getCurrency());
+        existingCar.setModel(updatedCar.getModel());
+        existingCar.setYear(updatedCar.getYear());
+        existingCar.setCarType(updatedCar.getCarType());
+        existingCar.setMileage(updatedCar.getMileage());
+        existingCar.setBrand(updatedCar.getBrand());
+        existingCar.setStore(updatedCar.getStore());
+        existingCar.setWorldwideQuantity(updatedCar.getWorldwideQuantity());
+        existingCar.setNationalQuantity(updatedCar.getNationalQuantity());
+        existingCar.setColor(updatedCar.getColor());
+        existingCar.setHorsePower(updatedCar.getHorsePower());
+        existingCar.setCategory(updatedCar.getCategory());
+        existingCar.setDoors(updatedCar.getDoors());
+        existingCar.setTraction(updatedCar.getTraction());
+        existingCar.setCarConfiguration(updatedCar.getCarConfiguration());
+        existingCar.setShift(updatedCar.getShift());
+        existingCar.setAccelerationToHundred(updatedCar.getAccelerationToHundred());
+        existingCar.setTorque(updatedCar.getTorque());
+        existingCar.setMotorization(updatedCar.getMotorization());
+        existingCar.setPropulsion(updatedCar.getPropulsion());
+        existingCar.setIsAvailable(updatedCar.getIsAvailable());
+        existingCar.setDefaultPicture(updatedCar.getDefaultPicture());
+    	
+    	
+    	repo.save(existingCar);
+    	return ResponseEntity.ok(null);
     }
-    */
 }
