@@ -1,11 +1,10 @@
-﻿using GlobalMotors.OrdersService.Helpers;
-using NpgsqlTypes;
+﻿using NpgsqlTypes;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
 namespace GlobalMotors.OrdersService.Models.Enums
 {
-    //[JsonConverter(typeof(TransactionStatusJsonConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum TransactionStatus
     {
         [PgName("Aguardando pagamento")]
@@ -30,6 +29,7 @@ namespace GlobalMotors.OrdersService.Models.Enums
         FalhaNaEntrega
     }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum PaymentTypes
     {
         [PgName("Transferência Bancária")]

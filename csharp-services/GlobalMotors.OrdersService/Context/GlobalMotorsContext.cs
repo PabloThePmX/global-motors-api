@@ -27,13 +27,7 @@ public partial class GlobalMotorsContext : DbContext
 
     public virtual DbSet<Shipping> Shippings { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Server=localhost;Port=5432;Database=global_motors;User Id=postgres;Password=postgres;", opt =>
-        {
-            opt.MapEnum<PaymentTypes>(enumName: "payment_types");
-            opt.MapEnum<TransactionStatus>(enumName: "transaction_status");
-        });
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -111,7 +105,8 @@ public partial class GlobalMotorsContext : DbContext
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("last_updated");
             entity.Property(e => e.Order).HasColumnName("order");
-            entity.Property(e => e.ShippingAddress).HasColumnName("shipping_address");
+            entity.Property(e => e.ShippingAddress)
+                .HasColumnName("shipping_address");
             entity.Property(e => e.ShippingPrice)
                 .HasPrecision(10, 2)
                 .HasColumnName("shipping_price");
