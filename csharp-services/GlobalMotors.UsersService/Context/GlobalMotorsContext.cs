@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GlobalMotors.UsersService.Context;
 
-public partial class GlobalMotorsContext : DbContext
+public class GlobalMotorsContext : DbContext
 {
     public GlobalMotorsContext()
     {
@@ -82,6 +82,4 @@ public partial class GlobalMotorsContext : DbContext
 
         OnModelCreatingPartial(modelBuilder);
     }
-
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

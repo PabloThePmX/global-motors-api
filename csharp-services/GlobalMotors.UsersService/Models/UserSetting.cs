@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace GlobalMotors.UsersService.Models;
 
-public partial class UserSetting
+public class UserSetting
 {
     public Guid User { get; set; }
 

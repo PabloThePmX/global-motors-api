@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace GlobalMotors.UsersService.Models;
 
-public partial class FavoriteCar
+public class FavoriteCar
 {
     public Guid User { get; set; }
 
