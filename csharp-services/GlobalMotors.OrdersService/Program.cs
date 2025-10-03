@@ -5,10 +5,8 @@ using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
-using GlobalMotors.OrdersService.Models.DTO;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using Steeltoe.Discovery.Client;
-using GlobalMotors.OrdersService.Models.Enums;
+using GlobalMotors.OrdersService.Models.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,13 +27,8 @@ builder.Services.AddSwaggerGen(opt =>
 
 });
 
-builder.Services.AddDbContextFactory<GlobalMotorsContext>(opt =>
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), en =>
-    {
-        en.MapEnum<PaymentTypes>(enumName: "payment_types");
-        en.MapEnum<TransactionStatus>(enumName: "transaction_status");
-    })
-);
+builder.Services.AddDbContextFactory<GlobalMotorsOrdersContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDiscoveryClient(builder.Configuration);
 builder.Services.AddHealthChecks();
@@ -48,7 +41,7 @@ builder.Services.Configure<JsonOptions>(opt =>
 var app = builder.Build();
 
 var scope = app.Services.CreateScope();
-var context = scope.ServiceProvider.GetRequiredService<GlobalMotorsContext>();
+var context = scope.ServiceProvider.GetRequiredService<GlobalMotorsOrdersContext>();
 
 // Configure the HTTP request pipeline.
 app.UseSwagger();
@@ -68,7 +61,7 @@ app.MapGet("/orders/{userId}", async ([FromRoute] Guid userId) =>
 })
 .WithTags("Orders");
 
-app.MapPost("/orders", async ([FromBody] OrderDTO order) =>
+app.MapPost("/orders", async ([FromBody] OrderRequestDTO order) =>
 {
     #region Create Order
 
@@ -115,15 +108,12 @@ app.MapPost("/orders", async ([FromBody] OrderDTO order) =>
 })
 .WithTags("Orders");
 
-app.MapPut("/orders/{id}", async ([FromRoute] Guid id, [FromBody] Order order) =>
+app.MapPut("/orders/{id}", async ([FromRoute] Guid id, [FromBody] OrderRequestDTO order) =>
 {
     var oldOrder = await context.Orders.FindAsync(id);
 
     if (oldOrder == null)
         return Results.NotFound();
-
-    if (oldOrder.Id != id)
-        return Results.BadRequest();
 
     context.Entry(oldOrder).CurrentValues.SetValues(order);
 
@@ -158,7 +148,7 @@ app.MapGet("orders/shippings/{id}", async ([FromRoute] Guid id) =>
 })
 .WithTags("Shippings");
 
-app.MapPost("/orders/shippings", async ([FromBody] ShippingDTO shipping) =>
+app.MapPost("/orders/shippings", async ([FromBody] ShippingRequestDTO shipping) =>
 {
     var newShipping = await context.Shippings.AddAsync(MapDtoToShipping(shipping));
 
@@ -172,15 +162,12 @@ app.MapPost("/orders/shippings", async ([FromBody] ShippingDTO shipping) =>
 .WithTags("Shippings")
 .WithDescription("Pode deixar que em um primeiro momento, o backend vai criar o frete.");
 
-app.MapPut("/orders/shippings/{id}", async ([FromRoute] Guid id, [FromBody] Shipping shipping) =>
+app.MapPut("/orders/shippings/{id}", async ([FromRoute] Guid id, [FromBody] ShippingRequestDTO shipping) =>
 {
     var oldShipping = await context.Shippings.FindAsync(id);
 
     if (oldShipping == null)
         return Results.NotFound();
-
-    if (oldShipping.Id != id)
-        return Results.BadRequest();
 
     context.Entry(oldShipping).CurrentValues.SetValues(shipping);
 
@@ -236,7 +223,7 @@ app.MapDelete("/orders/cart/{userId}/{carId}", async ([FromRoute] Guid userId, [
 
 #endregion
 
-Order MapDtoToOrder(OrderDTO order) => new Order 
+Order MapDtoToOrder(OrderRequestDTO order) => new Order 
 {
     OrderNumber = order.OrderNumber,
     Buyer = order.Buyer,
@@ -246,7 +233,7 @@ Order MapDtoToOrder(OrderDTO order) => new Order
     Status = order.Status
 };
 
-Shipping MapDtoToShipping(ShippingDTO shipping) => new Shipping
+Shipping MapDtoToShipping(ShippingRequestDTO shipping) => new Shipping
 {
     ShippingPrice = shipping.ShippingPrice,
     ShippingAddress = shipping.ShippingAddress,

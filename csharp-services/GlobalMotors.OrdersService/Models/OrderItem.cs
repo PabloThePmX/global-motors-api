@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GlobalMotors.OrdersService.Models;
 
-public partial class OrderItem
+public class OrderItem
 {
     public Guid Order { get; set; }
 
