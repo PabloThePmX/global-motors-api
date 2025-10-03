@@ -30,20 +30,13 @@ builder.Services.AddSwaggerGen(opt =>
         Description = "Documentação da API do Microsserviço Auth, contendo rotas para Register e Login, bem como alterções nas informações do usuário.",
     });
 
-    //opt.EnableAnnotations();
+    opt.EnableAnnotations();
     opt.UseInlineDefinitionsForEnums();
 
 });
 
-builder.Services.AddDbContextFactory<GlobalMotorsContext>(opt =>
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), en =>
-    {
-        en.MapEnum<BrStates>(enumName: "br_states");
-        en.MapEnum<DocumentTypes>(enumName: "document_types");
-        en.MapEnum<Genders>(enumName: "genders");
-        en.MapEnum<UserRoles>(enumName: "user_roles");
-    })
-);
+builder.Services.AddDbContextFactory<GlobalMotorsAuthContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDiscoveryClient(builder.Configuration);
 builder.Services.AddHealthChecks();
@@ -56,7 +49,7 @@ builder.Services.Configure<JsonOptions>(opt =>
 var app = builder.Build();
 
 var scope = app.Services.CreateScope();
-var context = scope.ServiceProvider.GetRequiredService<GlobalMotorsContext>();
+var context = scope.ServiceProvider.GetRequiredService<GlobalMotorsAuthContext>();
 
 // Configure the HTTP request pipeline.
 app.UseSwagger();
@@ -68,7 +61,7 @@ app.UseHttpsRedirection();
 #region Auth
 
 //https://github.com/patrickgod/JwtWebApiDotNet7/blob/master/JwtWebApiDotNet7/Controllers/AuthController.cs
-app.MapPost("auth/signup", async ([FromBody] UserDTO newUser) =>
+app.MapPost("auth/signup", async ([FromBody] UserRequestDTO newUser) =>
 {
     string passwordHash = BCrypt.Net.BCrypt.HashPassword(newUser.Password);
 
@@ -125,15 +118,12 @@ app.MapGet("auth/users/{userId}", async ([FromRoute] Guid userId) =>
 })
 .WithTags("Users");
 
-app.MapPut("auth/users/{userId}", async ([FromRoute] Guid userId, [FromBody] User newUser) =>
+app.MapPut("auth/users/{userId}", async ([FromRoute] Guid userId, [FromBody] UserRequestDTO newUser) =>
 {
     var oldUser = await context.Users.FindAsync(userId);
 
     if (oldUser == null)
         return Results.NotFound();
-
-    if (oldUser.Id != userId)
-        return Results.BadRequest();
 
     string passwordHash = BCrypt.Net.BCrypt.HashPassword(newUser.Password);
 
@@ -198,7 +188,7 @@ ClaimsPrincipal? ValidateToken(string jwt)
 
 }
 
-User MapDtoToUser(UserDTO user) => new User()
+User MapDtoToUser(UserRequestDTO user) => new User()
 {
     Email = user.Email,
     Password = user.Password,
@@ -209,7 +199,6 @@ User MapDtoToUser(UserDTO user) => new User()
     LastName = user.LastName,
     Gender = user.Gender,
     Role = user.Role,
-    CurrentAddress = user.CurrentAddress,
     Picture = user.Picture,
     PhoneNumber = user.PhoneNumber
 };
