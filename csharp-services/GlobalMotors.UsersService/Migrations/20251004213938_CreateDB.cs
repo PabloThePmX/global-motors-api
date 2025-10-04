@@ -13,43 +13,43 @@ namespace GlobalMotors.UsersService.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "FavoriteCars",
+                name: "favorite_cars",
                 columns: table => new
                 {
-                    User = table.Column<Guid>(type: "uuid", nullable: false),
-                    Car = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastUpdated = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    user = table.Column<Guid>(type: "uuid", nullable: false),
+                    car = table.Column<Guid>(type: "uuid", nullable: false),
+                    last_updated = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FavoriteCars", x => new { x.User, x.Car });
+                    table.PrimaryKey("pk_favorite_cars", x => new { x.user, x.car });
                 });
 
             migrationBuilder.CreateTable(
-                name: "SystemInfo",
+                name: "system_info",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
+                    id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Version = table.Column<string>(type: "text", nullable: true)
+                    version = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SystemInfo", x => x.Id);
+                    table.PrimaryKey("pk_system_info", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserSettings",
+                name: "user_settings",
                 columns: table => new
                 {
-                    User = table.Column<Guid>(type: "uuid", nullable: false),
-                    Language = table.Column<int>(type: "integer", nullable: false),
-                    DisplayedCurrency = table.Column<int>(type: "integer", nullable: false),
-                    LastUpdated = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    user = table.Column<Guid>(type: "uuid", nullable: false),
+                    language = table.Column<int>(type: "integer", nullable: false),
+                    displayed_currency = table.Column<int>(type: "integer", nullable: false),
+                    last_updated = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserSettings", x => x.User);
+                    table.PrimaryKey("pk_user_settings", x => x.user);
                 });
         }
 
@@ -57,13 +57,13 @@ namespace GlobalMotors.UsersService.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "FavoriteCars");
+                name: "favorite_cars");
 
             migrationBuilder.DropTable(
-                name: "SystemInfo");
+                name: "system_info");
 
             migrationBuilder.DropTable(
-                name: "UserSettings");
+                name: "user_settings");
         }
     }
 }

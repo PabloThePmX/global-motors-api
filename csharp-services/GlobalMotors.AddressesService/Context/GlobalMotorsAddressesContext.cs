@@ -10,5 +10,6 @@ namespace GlobalMotors.AddressesService.Context
         }
 
         public virtual DbSet<Address> Addresses { get; set; }
+                
     }
 }

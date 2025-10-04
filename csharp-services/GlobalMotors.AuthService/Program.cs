@@ -36,7 +36,8 @@ builder.Services.AddSwaggerGen(opt =>
 });
 
 builder.Services.AddDbContextFactory<GlobalMotorsAuthContext>(opt =>
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    .UseSnakeCaseNamingConvention());
 
 builder.Services.AddDiscoveryClient(builder.Configuration);
 builder.Services.AddHealthChecks();

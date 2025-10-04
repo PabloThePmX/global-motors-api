@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GlobalMotors.UsersService.Migrations
 {
     [DbContext(typeof(GlobalMotorsUsersContext))]
-    [Migration("20251004192726_CreateDB")]
+    [Migration("20251004213938_CreateDB")]
     partial class CreateDB
     {
         /// <inheritdoc />
@@ -28,53 +28,65 @@ namespace GlobalMotors.UsersService.Migrations
             modelBuilder.Entity("GlobalMotors.UsersService.Models.FavoriteCar", b =>
                 {
                     b.Property<Guid>("User")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("user");
 
                     b.Property<Guid>("Car")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("car");
 
                     b.Property<DateTime?>("LastUpdated")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_updated");
 
-                    b.HasKey("User", "Car");
+                    b.HasKey("User", "Car")
+                        .HasName("pk_favorite_cars");
 
-                    b.ToTable("FavoriteCars");
+                    b.ToTable("favorite_cars", (string)null);
                 });
 
             modelBuilder.Entity("GlobalMotors.UsersService.Models.SystemInfo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Version")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("version");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_system_info");
 
-                    b.ToTable("SystemInfo");
+                    b.ToTable("system_info", (string)null);
                 });
 
             modelBuilder.Entity("GlobalMotors.UsersService.Models.UserSetting", b =>
                 {
                     b.Property<Guid>("User")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("user");
 
                     b.Property<int>("DisplayedCurrency")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("displayed_currency");
 
                     b.Property<int>("Language")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("language");
 
                     b.Property<DateTime?>("LastUpdated")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_updated");
 
-                    b.HasKey("User");
+                    b.HasKey("User")
+                        .HasName("pk_user_settings");
 
-                    b.ToTable("UserSettings");
+                    b.ToTable("user_settings", (string)null);
                 });
 #pragma warning restore 612, 618
         }

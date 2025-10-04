@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GlobalMotors.AddressesService.Migrations
 {
     [DbContext(typeof(GlobalMotorsAddressesContext))]
-    [Migration("20251002034839_CreateDB")]
+    [Migration("20251004213825_CreateDB")]
     partial class CreateDB
     {
         /// <inheritdoc />
@@ -29,39 +29,49 @@ namespace GlobalMotors.AddressesService.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("City")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("city");
 
                     b.Property<string>("Complement")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("complement");
 
                     b.Property<string>("Neighborhood")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("neighborhood");
 
                     b.Property<int>("Number")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("number");
 
                     b.Property<string>("PostalCode")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("postal_code");
 
                     b.Property<string>("ReferencePoint")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("reference_point");
 
                     b.Property<int>("States")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("states");
 
                     b.Property<string>("Street")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("street");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_addresses");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("addresses", (string)null);
                 });
 #pragma warning restore 612, 618
         }
