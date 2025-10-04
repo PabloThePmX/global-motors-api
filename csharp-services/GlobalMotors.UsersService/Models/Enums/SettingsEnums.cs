@@ -6,24 +6,16 @@ namespace GlobalMotors.UsersService.Models.Enums
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum Languages
     {
-        [PgName("PT-BR")]
-        PT,
-
-        [PgName("EN-US")]
-        EN,
-
-        [PgName("IT-IT")]
-        IT,
+        PTBR,
+        ENUS,
+        ITIT,
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum Currencies
     {
-        [PgName("USD")]
         USD,
-        [PgName("EUR")]
         EUR,
-        [PgName("BRL")]
         BRL
     }
 }
