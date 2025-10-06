@@ -1,10 +1,10 @@
-﻿using GlobalMotors.AuthService.Models.Enums;
+﻿using GlobalMotors.AddressesService.Models.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace GlobalMotors.AuthService.Models;
+namespace GlobalMotors.AddressesService.Models;
 
-public partial class Address
+public class Address
 {
     public Guid Id { get; set; }
 

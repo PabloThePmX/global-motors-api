@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace GlobalMotors.OrdersService.Models;
 
-public partial class CartItem
+public class CartItem
 {
     public Guid User { get; set; }
 

@@ -1,9 +1,8 @@
 ﻿using GlobalMotors.OrdersService.Models.Enums;
-using System.Text.Json.Serialization;
 
-namespace GlobalMotors.OrdersService.Models.DTO
+namespace GlobalMotors.OrdersService.Models.DTOs
 {
-    public class OrderDTO
+    public class OrderRequestDTO
     {
         public required string OrderNumber { get; set; }
 
@@ -16,8 +15,5 @@ namespace GlobalMotors.OrdersService.Models.DTO
         public bool? Delivered { get; set; }
 
         public required PaymentTypes PaymentType { get; set; }
-
-        [JsonIgnore]
-        public DateTime? LastUpdated { get; set; }
     }
 }

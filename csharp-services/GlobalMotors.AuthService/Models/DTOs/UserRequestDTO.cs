@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace GlobalMotors.AuthService.Models.DTOs
 {
-    public class UserDTO
+    public class UserRequestDTO
     {
         public required string Email { get; set; }
 
@@ -26,11 +26,5 @@ namespace GlobalMotors.AuthService.Models.DTOs
         public required Genders Gender { get; set; }
 
         public string? Picture { get; set; }
-
-        [JsonIgnore]
-        public Guid? CurrentAddress { get; set; }
-
-        [JsonIgnore]
-        public DateTime? LastUpdated { get; set; }
     }
 }

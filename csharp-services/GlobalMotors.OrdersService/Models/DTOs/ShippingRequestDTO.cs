@@ -1,8 +1,6 @@
-﻿using System.Text.Json.Serialization;
-
-namespace GlobalMotors.OrdersService.Models.DTO
+﻿namespace GlobalMotors.OrdersService.Models.DTOs
 {
-    public class ShippingDTO
+    public class ShippingRequestDTO
     {
         public required decimal ShippingPrice { get; set; }
 
@@ -15,8 +13,5 @@ namespace GlobalMotors.OrdersService.Models.DTO
         public DateOnly EstimatedDelivery { get; set; }
 
         public DateOnly? DeliveredAt { get; set; }
-
-        [JsonIgnore]
-        public DateTime? LastUpdated { get; set; }
     }
 }

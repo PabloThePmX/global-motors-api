@@ -24,18 +24,14 @@ builder.Services.AddSwaggerGen(opt =>
         Description = "Documentação da API do Microsserviço Users, contendo rotas para Configuração do Usuário (User Settings) e Favoritos (User Favorites).",
     });
 
-    //opt.EnableAnnotations();
+    opt.EnableAnnotations();
     opt.UseInlineDefinitionsForEnums();
 
 });
 
-builder.Services.AddDbContextFactory<GlobalMotorsContext>(opt =>
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), en =>
-    {
-        en.MapEnum<Currencies>(enumName: "currencies");
-        en.MapEnum<Languages>(enumName: "languages");
-    })
-);
+builder.Services.AddDbContextFactory<GlobalMotorsUsersContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    .UseSnakeCaseNamingConvention());
 
 builder.Services.AddDiscoveryClient(builder.Configuration);
 builder.Services.AddHealthChecks();
@@ -48,7 +44,7 @@ builder.Services.Configure<JsonOptions>(opt =>
 var app = builder.Build();
 
 var scope = app.Services.CreateScope();
-var context = scope.ServiceProvider.GetRequiredService<GlobalMotorsContext>();
+var context = scope.ServiceProvider.GetRequiredService<GlobalMotorsUsersContext>();
 
 // Configure the HTTP request pipeline.
 app.UseSwagger();
@@ -70,7 +66,7 @@ app.MapGet("/users/user-settings/{userId}", async ([FromRoute] Guid userId) =>
 app.MapPost("/users/user-settings/", async ([FromBody] UserSetting settings) =>
 {
     if (context.UserSettings.Where(x => x.User == settings.User).Any())
-        return Results.BadRequest("Usu�io j� possui configura��es.");
+        return Results.BadRequest("Usuário já possui configurações.");
 
     var newSettings = await context.UserSettings.AddAsync(settings);
 
