@@ -10,18 +10,26 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
-@Table(name = "conversion_rate")
-public class ConversionRateEntity {
+@IdClass(ExchangeRateId.class)
+@Table(name = "exchange_rate")
+public class ExchangeRateEntity {
 	
 	@Id
     @Enumerated
     @JdbcType(PostgreSQLEnumJdbcType.class)
-	@Column(name= "currency")
-	private currencies currency;
+	@Column(name= "currency_source")
+	private currencies currencySource;
+	
+	@Id
+    @Enumerated
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+	@Column(name= "currency_target")
+	private currencies currencyTarget;
 	
 	@Column(name= "rate")
 	private double rate ;
@@ -45,12 +53,20 @@ public class ConversionRateEntity {
 		this.dataSource = dataSource;
 	}
 
-	public currencies getCurrency() {
-		return currency;
+	public currencies getCurrencySource() {
+		return currencySource;
 	}
 
-	public void setCurrency(currencies currency) {
-		this.currency = currency;
+	public void setCurrencySource(currencies currencySource) {
+		this.currencySource = currencySource;
+	}
+
+	public currencies getCurrencyTarget() {
+		return currencyTarget;
+	}
+
+	public void setCurrencyTarget(currencies currencyTarget) {
+		this.currencyTarget = currencyTarget;
 	}
 
 	public double getRate() {

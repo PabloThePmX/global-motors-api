@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.globalmotors.currencies_service.clients.CurrencyBCClient;
 import br.com.globalmotors.currencies_service.clients.CurrencyBCResponse;
-import br.com.globalmotors.currencies_service.entities.ConversionRateEntity;
+import br.com.globalmotors.currencies_service.entities.ExchangeRateEntity;
 import br.com.globalmotors.currencies_service.models.Currency.currencies;
 import br.com.globalmotors.currencies_service.repository.CurrencyRepo;
 
@@ -43,7 +43,7 @@ public class CurrenciesController {
 	//se o banco central estiver fora e sem cache, vai pegar do banco o ultimo valor
 	
 	@GetMapping("/{value}/{source}/{target}")
-	public ResponseEntity<ConversionRateEntity> getCurrency(@PathVariable double value,
+	public ResponseEntity<ExchangeRateEntity> getCurrency(@PathVariable double value,
 			@PathVariable String source, @PathVariable String target) throws Exception {
 		
 		source = source.toUpperCase();
@@ -52,7 +52,7 @@ public class CurrenciesController {
 		String nameCache = "Currency";
 		String keyCache = source + target;
 		
-		ConversionRateEntity conversionRate = cacheManager.getCache(nameCache).get(keyCache, ConversionRateEntity.class);
+		ExchangeRateEntity conversionRate = cacheManager.getCache(nameCache).get(keyCache, ExchangeRateEntity.class);
 		
 		if(conversionRate != null) {
 			conversionRate.setDataSource("Cache");
@@ -60,18 +60,20 @@ public class CurrenciesController {
 			return ResponseEntity.ok(conversionRate);
 		}
 		
-		conversionRate = new ConversionRateEntity();
+		conversionRate = new ExchangeRateEntity();
 		try {
 			//divide pq precisa ver quanto o "target cabe no source"
 			conversionRate.setRate(getConversionRateFromApi(source.toUpperCase())/getConversionRateFromApi(target.toUpperCase()));
 			dataSource = "API BCB";
 			conversionRate.setLastUpdated(conversionDate);
 		} catch (Exception e) {
-			conversionRate = repository.findByCurrency(currencies.valueOf(target)).orElseThrow(() -> new Exception("Currency not supported!"));
+			conversionRate = repository.findByCurrencySourceAndCurrencyTarget(currencies.valueOf(source) ,currencies.valueOf(target))
+					.orElseThrow(() -> new Exception("Currency not supported!"));
 			dataSource = "Local Database";
 		}
 		
-		conversionRate.setCurrency(currencies.valueOf(target));
+		conversionRate.setCurrencySource(currencies.valueOf(source));
+		conversionRate.setCurrencyTarget(currencies.valueOf(target));
 		conversionRate.setDataSource(dataSource);
 		conversionRate.setConvertedValue(value * conversionRate.getRate());
 		
