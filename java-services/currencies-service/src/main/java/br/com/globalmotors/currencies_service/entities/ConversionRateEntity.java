@@ -1,10 +1,15 @@
 package br.com.globalmotors.currencies_service.entities;
 
-
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+
+import br.com.globalmotors.currencies_service.models.Currency.currencies;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -12,31 +17,41 @@ import jakarta.persistence.Transient;
 @Table(name = "conversion_rate")
 public class ConversionRateEntity {
 	
+	@Id
+    @Enumerated
+    @JdbcType(PostgreSQLEnumJdbcType.class)
 	@Column(name= "currency")
-	private String currencies;
+	private currencies currency;
 	
 	@Column(name= "rate")
 	private double rate ;
 	
 	@Column(name= "last_updated")
-	private LocalDateTime lastUpdate;
+	private LocalDateTime lastUpdated;
 	
 	@Transient
 	private double convertedValue;
 	
 	@Transient
-	private String enviroment;
+	private String dataSource;
 	
 	//Getters and Setters
 	 
-	public String getCurrencies() {
-		return currencies;
+	public String getDataSource() {
+		return dataSource;
 	}
 
-	public void setCurrencies(String currencies) {
-		this.currencies = currencies;
+	public void setDataSource(String dataSource) {
+		this.dataSource = dataSource;
 	}
 
+	public currencies getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(currencies currency) {
+		this.currency = currency;
+	}
 
 	public double getRate() {
 		return rate;
@@ -46,12 +61,12 @@ public class ConversionRateEntity {
 		this.rate = rate;
 	}
 
-	public LocalDateTime getLastUpdate() {
-		return lastUpdate;
+	public LocalDateTime getLastUpdated() {
+		return lastUpdated;
 	}
 
-	public void setLastUpdate(LocalDateTime lastUpdate) {
-		this.lastUpdate = lastUpdate;
+	public void setLastUpdated(LocalDateTime lastUpdate) {
+		this.lastUpdated = lastUpdate;
 	}
 
 	public double getConvertedValue() {
@@ -61,14 +76,4 @@ public class ConversionRateEntity {
 	public void setConvertedValue(double convertedValue) {
 		this.convertedValue = convertedValue;
 	}
-
-	public String getEnviroment() {
-		return enviroment;
-	}
-
-	public void setEnviroment(String enviroment) {
-		this.enviroment = enviroment;
-	}
-	
-	
 }

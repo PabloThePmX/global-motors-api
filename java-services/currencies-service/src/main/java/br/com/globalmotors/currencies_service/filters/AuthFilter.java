@@ -1,3 +1,4 @@
+/*
 package br.com.globalmotors.currencies_service.filters;
 
 import java.util.List;
@@ -52,3 +53,4 @@ public class AuthFilter implements GlobalFilter, Ordered {
 	}
 
 }
+*/
