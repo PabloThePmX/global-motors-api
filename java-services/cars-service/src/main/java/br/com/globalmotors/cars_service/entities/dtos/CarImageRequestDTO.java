@@ -1,22 +1,19 @@
 package br.com.globalmotors.cars_service.entities.dtos;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
+import java.util.UUID;
 
-public class CarImageDTO {
-	@Column(name = "image")
+public class CarImageRequestDTO {
+	
 	private String image;
 	
-	@Id
-	@Column(name = "car")
-	private String car;
+	private UUID car;
 	
 	//Getters and Setters
 	
-	public String getCar() {
+	public UUID getCar() {
 		return car;
 	}
-	public void setCar(String car) {
+	public void setCar(UUID car) {
 		this.car = car;
 	}
 	

@@ -10,32 +10,32 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.globalmotors.cars_service.entities.CarEntity;
-import br.com.globalmotors.cars_service.entities.dtos.CarDTO;
-import br.com.globalmotors.cars_service.repositories.CarsRepo;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import br.com.globalmotors.cars_service.entities.dtos.CarRequestDTO;
+import br.com.globalmotors.cars_service.repositories.CarRepo;
 
 @RestController
 @RequestMapping("cars")
-public class CarsController {
+public class CarController {
 
-    private final CarsRepo repo;
+    private final CarRepo repo;
 
-    public CarsController(CarsRepo repo) {
+    public CarController(CarRepo repo) {
         this.repo = repo;
     }
     
     @GetMapping("/")
-    public ResponseEntity<List<CarEntity>>getAll(){
+    public ResponseEntity<List<CarEntity>> getAll(){
     	List<CarEntity>cars = repo.findAll();
     	return ResponseEntity.ok(cars);
     }
     
-    @GetMapping("/id_carro")
-    public ResponseEntity<CarEntity>getById(@PathVariable("carId") UUID Id) throws Exception{
+    @GetMapping("/{carId}")
+    public ResponseEntity<CarEntity> getById(@PathVariable("carId") UUID Id) throws Exception{
     	CarEntity car = repo.findById(Id)
     			.orElseThrow(() -> new Exception("Carro não encontrado."));
     	
@@ -43,15 +43,15 @@ public class CarsController {
     }
     
     @PostMapping
-    public ResponseEntity<CarEntity>create(@RequestBody CarDTO newCar) {
+    public ResponseEntity<CarEntity>create(@RequestBody CarRequestDTO newCar) {
     	var completeCar = new CarEntity();
     	BeanUtils.copyProperties(newCar, completeCar);
     	CarEntity save = repo.save(completeCar);
     	return ResponseEntity.created(URI.create("/cars/" + save.getId())).body(save);
     }
     
-    @PutMapping("/{id_carro}")
-    public ResponseEntity<CarEntity>update(@PathVariable("carId") UUID Id, @RequestBody CarEntity updatedCar) throws Exception {
+    @PutMapping("/{carId}")
+    public ResponseEntity<CarEntity> update(@PathVariable("carId") UUID Id, @RequestBody CarRequestDTO updatedCar) throws Exception {
     	CarEntity existingCar = repo.findById(Id)
     			.orElseThrow(() -> new Exception ("Carro não encontrado."));
     	

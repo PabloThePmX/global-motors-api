@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import br.com.globalmotors.cars_service.entities.CarEntity;
 
 @Repository
-public interface CarsRepo extends JpaRepository<CarEntity, UUID>{
+public interface CarRepo extends JpaRepository<CarEntity, UUID>{
 	
 }

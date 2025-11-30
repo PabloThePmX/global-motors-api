@@ -9,5 +9,7 @@ import br.com.globalmotors.cars_service.entities.StoreEntity;
 
 @Repository
 public interface StoreRepo extends JpaRepository<StoreEntity, UUID>{
-
+	boolean existsByCnpj(String cnpj);
+	    
+    boolean existsByEmail(String email);
 }

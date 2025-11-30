@@ -15,25 +15,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.globalmotors.cars_service.entities.BrandEntity;
-import br.com.globalmotors.cars_service.entities.dtos.BrandDTO;
-import br.com.globalmotors.cars_service.repositories.BrandsRepo;
+import br.com.globalmotors.cars_service.entities.dtos.BrandRequestDTO;
+import br.com.globalmotors.cars_service.repositories.BrandRepo;
 
 @RestController
 @RequestMapping("cars/brands")
-public class BrandsController {
+public class BrandController {
 	
-	private final BrandsRepo brandsRepo;
+	private final BrandRepo brandsRepo;
 	
-	public BrandsController(BrandsRepo brandsRepo) {
+	public BrandController(BrandRepo brandsRepo) {
 		this.brandsRepo = brandsRepo;
 	}
-	@GetMapping("/") //Retorna todos os dados
+	
+	@GetMapping("/")
 	public ResponseEntity<List<BrandEntity>> getAll() {
 		List<BrandEntity> brands = brandsRepo.findAll();
 		return ResponseEntity.ok(brands);
 	}
 	
-    @GetMapping("/{brandId}") //Retorna a marca com tal id
+    @GetMapping("/{brandId}")
     public ResponseEntity<BrandEntity> getById(@PathVariable("brandId") UUID id) throws Exception {
         BrandEntity brand = brandsRepo.findById(id)
                 .orElseThrow(() -> new Exception("Marca não encontrada."));
@@ -41,16 +42,16 @@ public class BrandsController {
         return ResponseEntity.ok(brand);
     }
 
-    @PostMapping //Cria marca
-    public ResponseEntity<BrandEntity> create(@RequestBody BrandDTO newBrand) {
+    @PostMapping
+    public ResponseEntity<BrandEntity> create(@RequestBody BrandRequestDTO newBrand) {
     	var completeBrand = new BrandEntity();
     	BeanUtils.copyProperties(newBrand, completeBrand);
     	BrandEntity saved = brandsRepo.save(completeBrand);
         return ResponseEntity.created(URI.create("/cars/brands/" + saved.getId())).body(saved);
     }
     
-    @PutMapping("/{brandId}") //Atualiza uma marca
-    public ResponseEntity<BrandEntity> update(@PathVariable("brandId") UUID id, @RequestBody BrandEntity updatedBrand) throws Exception {
+    @PutMapping("/{brandId}")
+    public ResponseEntity<BrandEntity> update(@PathVariable("brandId") UUID id, @RequestBody BrandRequestDTO updatedBrand) throws Exception {
         BrandEntity existingBrand = brandsRepo.findById(id)
             .orElseThrow(() -> new Exception("Marca não encontrada."));
 

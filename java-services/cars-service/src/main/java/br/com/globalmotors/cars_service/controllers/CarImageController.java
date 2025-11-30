@@ -2,7 +2,6 @@ package br.com.globalmotors.cars_service.controllers;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.BeanUtils;
@@ -12,13 +11,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.globalmotors.cars_service.entities.CarImageEntity;
-import br.com.globalmotors.cars_service.entities.dtos.CarImageDTO;
+import br.com.globalmotors.cars_service.entities.dtos.CarImageRequestDTO;
+import br.com.globalmotors.cars_service.entities.dtos.CarImageUpdateDTO;
 import br.com.globalmotors.cars_service.repositories.CarImageRepo;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
 @RequestMapping("cars/car-images/")
@@ -36,25 +36,49 @@ public class CarImageController {
 		return ResponseEntity.ok(images);
 	}
 	
-	//TODO REVISAR
+	@GetMapping("/{carId}")
+	public ResponseEntity<List<CarImageEntity>> getByCar(@PathVariable ("carId") UUID car) throws Exception {
+		List<CarImageEntity> images = repo.findByCar(car)
+				.filter(list -> !list.isEmpty())
+				.orElseThrow (() -> new Exception ("Carro não encontrado ou sem imagens disponíveis."));
+		
+		return ResponseEntity.ok(images);
+	}
+	
+	@GetMapping("/{carId}/{imageId}")
+	public ResponseEntity<CarImageEntity> getById(@PathVariable ("carId") UUID car, @PathVariable ("imageId") int id) throws Exception {
+		CarImageEntity existingImage = repo.findByIdAndCar(id, car)
+				.orElseThrow (() -> new Exception ("Imagem não encontrada."));
+		
+		return ResponseEntity.ok(existingImage);
+	}
+	
 	@PostMapping 
-	public ResponseEntity<CarImageEntity>create(@RequestBody CarImageDTO newImage) {
+	public ResponseEntity<CarImageEntity> create(@RequestBody CarImageRequestDTO newImage) {
 		var completeImage = new CarImageEntity();
 		BeanUtils.copyProperties(newImage, completeImage);
 		CarImageEntity save = repo.save(completeImage);
 		return ResponseEntity.created(URI.create("/cars/car-images/" + save.getId())).body(save);
 	}
 	
-	@PutMapping("/{id_carro}/{id_imagem}")
-	public ResponseEntity<CarImageEntity> update (@PathVariable ("carImageId") UUID Id, @RequestBody CarImageEntity updateImage) throws Exception {
-		CarImageEntity existingImage = repo.findById(Id)
-				.orElseThrow (() -> new Exception ("Imagem não encontrada. "));
+	@PutMapping("/{carId}/{imageId}")
+	public ResponseEntity<CarImageEntity> update (@PathVariable ("carId") UUID car, @PathVariable ("imageId") int id, @RequestBody CarImageUpdateDTO updateImage) throws Exception {
+		CarImageEntity existingImage = repo.findByIdAndCar(id, car)
+				.orElseThrow (() -> new Exception ("Imagem não encontrada."));
+		
 		existingImage.setImage(updateImage.getImage());
-		existingImage.setCar(updateImage.getCar());
 		
 		repo.save(existingImage);
 		return ResponseEntity.ok(null);
 	}
 	
-	//TODO delete
+	@DeleteMapping("/{carId}/{imageId}")
+	public ResponseEntity<CarImageEntity> delete (@PathVariable ("carId") UUID car, @PathVariable ("imageId") int id) throws Exception{
+		CarImageEntity existingImage = repo.findByIdAndCar(id, car)
+				.orElseThrow (() -> new Exception ("Imagem não encontrada."));
+		
+		repo.delete(existingImage);
+		
+		return ResponseEntity.ok(null);	
+	}
 }
