@@ -2,35 +2,19 @@ package br.com.globalmotors.currencies_service.clients;
 
 import java.util.List;
 
+import br.com.globalmotors.currencies_service.models.Currency;
+
 public class CurrencyBCResponse {
-	private List<CurrencyBC> value;
+	private List<Currency> value;
 	
 	//Getters and Setters
 	
-	public List<CurrencyBC> getValue() {
+	public List<Currency> getValue() {
 		return value;
 	}
 
-	public void setValue(List<CurrencyBC> value) {
+	public void setValue(List<Currency> value) {
 		this.value = value;
 	}
-	
-	
-	public class CurrencyBC {
-		private double cotacaoVenda;
 		
-		//Getters and Setters
-		
-		public double getCotacaoVenda() {
-			return cotacaoVenda;
-		}
-
-		public void setCotacaoVenda(double cotacaoVenda) {
-			this.cotacaoVenda = cotacaoVenda;
-		}
-		
-		
-	}
-
-	
 }

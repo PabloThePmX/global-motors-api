@@ -1,4 +1,4 @@
-// Use DBML to define your database structure// Docs: https://dbml.dbdiagram.io/docs
+//UUIDs for exposed tables
 
 Table cars {
   id uuid [primary key, default: `gen_random_uuid()`] // DEFAULT gen_random_uuid()
@@ -25,7 +25,7 @@ Table cars {
   propulsion propulsion_types [not null]
   is_available boolean [default: true]
   default_picture varchar(255)
-  last_update_datetime timestamp [default: `now()`]
+  last_updated timestamp [default: `now()`]
 }
 
 Table brands {
@@ -34,7 +34,7 @@ Table brands {
   description varchar(255) 
   country_origin countries [not null]
   logo varchar(255) 
-  last_update_datetime timestamp [default: `now()`]
+  last_updated timestamp [default: `now()`]
 }
 
 Table stores {
@@ -42,13 +42,13 @@ Table stores {
   name varchar(255) [not null]
   address uuid [ref: > addresses.id] 
   cnpj varchar(14) [unique, not null]
-  email varchar(150) [not null]
+  email varchar(150) [not null, unique]
   phone_number varchar(11)
   website varchar(255)
   description varchar(255) 
   owner uuid [ref: > users.id, not null] 
   is_active boolean [not null]
-  last_update_datetime timestamp [default: `now()`]
+  last_updated timestamp [default: `now()`]
 }
 
 Table addresses { 
@@ -63,7 +63,7 @@ Table addresses {
   reference_point varchar(100)
 }
 
-Table shipping {
+Table shippings {
   id uuid [primary key, default: `gen_random_uuid()`]
   shipping_price decimal(10,2) [not null]
   shipping_address uuid [ref: > archived_addresses.id, not null]
@@ -71,13 +71,13 @@ Table shipping {
   tracking varchar(40) [not null]
   estimated_delivery date [not null]
   delivered_at date
-  last_update_datetime timestamp [default: `now()`]
+  last_updated timestamp [default: `now()`]
 }
 
 Table favorite_cars {
   user uuid [primary key, ref: > users.id]
   car uuid [primary key, ref: > cars.id]
-  last_update_datetime timestamp [default: `now()`]
+  last_updated timestamp [default: `now()`]
 }
 
 Table car_images {
@@ -89,7 +89,7 @@ Table car_images {
 Table cart_items {
   user uuid [primary key, ref: > users.id]
   car uuid [primary key, ref: > cars.id]
-  last_update_datetime timestamp [default: `now()`]
+  last_updated timestamp [default: `now()`]
 }
 
 Table orders {
@@ -100,7 +100,7 @@ Table orders {
   status transaction_status [not null]
   delivered boolean
   payment_type payment_types [not null]
-  last_update_datetime timestamp [default: `now()`]
+  last_updated timestamp [default: `now()`]
 }
 
 Table order_items {
@@ -110,7 +110,7 @@ Table order_items {
 
 Table users {
   id uuid [primary key, default: `gen_random_uuid()`]
-  email varchar(150) [not null]
+  email varchar(150) [not null, unique]
   password varchar(100) [not null]
   role user_roles [not null]
   phone_number varchar(11) 
@@ -123,14 +123,14 @@ Table users {
   picture varchar(255)
   //Pode ser nulo, pq pode ser que o address seja criado depois apenas
   current_address uuid [ref: > addresses.id]
-  last_update_datetime timestamp [default: `now()`]
+  last_updated timestamp [default: `now()`]
 }
 
 Table user_settings {
   user uuid [primary key, ref: > users.id]
   language languages [default: "PT-BR"]
   displayed_currency currencies [default: "USD"]
-  last_update_datetime timestamp [default: `now()`]
+  last_updated timestamp [default: `now()`]
 }
 
 //nao vai ser exposto
@@ -160,7 +160,7 @@ Table archived_cars {
   propulsion propulsion_types [not null]
   is_available boolean
   default_picture varchar(255)
-  last_update_datetime timestamp
+  last_updated timestamp
 }
 
 Table archived_brands {
@@ -169,7 +169,7 @@ Table archived_brands {
   description varchar(255) 
   country_origin countries [not null]
   logo varchar(255) 
-  last_update_datetime timestamp
+  last_updated timestamp
 }
 
 Table archived_stores {
@@ -177,13 +177,13 @@ Table archived_stores {
   name varchar(255) [not null]
   address uuid [ref: > archived_addresses.id] 
   cnpj varchar(14) [unique, not null]
-  email varchar(150) [not null]
+  email varchar(150) [not null, unique]
   phone_number varchar(11)
   website varchar(255)
   description varchar(255) 
   owner uuid [ref: > users.id, not null] 
   is_active boolean [not null]
-  last_update_datetime timestamp
+  last_updated timestamp
 }
 
 Table archived_addresses { 
@@ -207,7 +207,7 @@ Table system_info {
 Table conversion_rate {
   currency currencies [primary key]
   rate decimal(5,2)
-  last_update_datetime timestamp
+  last_updated timestamp
 }
 
 //=========================ENUMS
@@ -250,11 +250,12 @@ Enum languages {
 }
 
 Enum colors {
-  Red
-  White
-  Black
-  Blue
-  Green
+  Vermelho
+  Branco
+  Preto
+  Azul
+  Verde
+  Amarelo
 }
 
 Enum transaction_status {

@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 			 fallback = CurrencyBCFallback.class)
 public interface CurrencyBCClient {
 	
-	@GetMapping("/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@moeda='{moeda}'&@dataCotacao='{dataCotacao}'&$format=json")
-	CurrencyBCResponse getCurrency(@PathVariable String moeda, @PathVariable String dataCotacao);
-	
-	
-	
+	@GetMapping("/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@moeda='{currency}'&@dataCotacao='{date}'&$format=json")
+	CurrencyBCResponse getCurrency(@PathVariable String currency, @PathVariable String date);
 }

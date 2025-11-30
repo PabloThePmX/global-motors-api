@@ -37,11 +37,12 @@ CREATE TYPE "languages" AS ENUM (
 );
 
 CREATE TYPE "colors" AS ENUM (
-  'Red',
-  'White',
-  'Black',
-  'Blue',
-  'Green'
+  'Vermelho',
+  'Branco',
+  'Preto',
+  'Azul',
+  'Verde',
+  'Amarelo'
 );
 
 CREATE TYPE "transaction_status" AS ENUM (
@@ -153,7 +154,7 @@ CREATE TABLE "cars" (
   "propulsion" propulsion_types NOT NULL,
   "is_available" boolean DEFAULT true,
   "default_picture" varchar(255),
-  "last_update_datetime" timestamp DEFAULT (now())
+  "last_updated" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "brands" (
@@ -162,7 +163,7 @@ CREATE TABLE "brands" (
   "description" varchar(255),
   "country_origin" countries NOT NULL,
   "logo" varchar(255),
-  "last_update_datetime" timestamp DEFAULT (now())
+  "last_updated" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "stores" (
@@ -170,13 +171,13 @@ CREATE TABLE "stores" (
   "name" varchar(255) NOT NULL,
   "address" uuid,
   "cnpj" varchar(14) UNIQUE NOT NULL,
-  "email" varchar(150) NOT NULL,
+  "email" varchar(150) UNIQUE NOT NULL,
   "phone_number" varchar(11),
   "website" varchar(255),
   "description" varchar(255),
   "owner" uuid NOT NULL,
   "is_active" boolean NOT NULL,
-  "last_update_datetime" timestamp DEFAULT (now())
+  "last_updated" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "addresses" (
@@ -191,7 +192,7 @@ CREATE TABLE "addresses" (
   "reference_point" varchar(100)
 );
 
-CREATE TABLE "shipping" (
+CREATE TABLE "shippings" (
   "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "shipping_price" decimal(10,2) NOT NULL,
   "shipping_address" uuid NOT NULL,
@@ -199,13 +200,13 @@ CREATE TABLE "shipping" (
   "tracking" varchar(40) NOT NULL,
   "estimated_delivery" date NOT NULL,
   "delivered_at" date,
-  "last_update_datetime" timestamp DEFAULT (now())
+  "last_updated" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "favorite_cars" (
   "user" uuid,
   "car" uuid,
-  "last_update_datetime" timestamp DEFAULT (now()),
+  "last_updated" timestamp DEFAULT (now()),
   PRIMARY KEY ("user", "car")
 );
 
@@ -219,7 +220,7 @@ CREATE TABLE "car_images" (
 CREATE TABLE "cart_items" (
   "user" uuid,
   "car" uuid,
-  "last_update_datetime" timestamp DEFAULT (now()),
+  "last_updated" timestamp DEFAULT (now()),
   PRIMARY KEY ("user", "car")
 );
 
@@ -231,7 +232,7 @@ CREATE TABLE "orders" (
   "status" transaction_status NOT NULL,
   "delivered" boolean,
   "payment_type" payment_types NOT NULL,
-  "last_update_datetime" timestamp DEFAULT (now())
+  "last_updated" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "order_items" (
@@ -242,7 +243,7 @@ CREATE TABLE "order_items" (
 
 CREATE TABLE "users" (
   "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "email" varchar(150) NOT NULL,
+  "email" varchar(150) UNIQUE NOT NULL,
   "password" varchar(100) NOT NULL,
   "role" user_roles NOT NULL,
   "phone_number" varchar(11),
@@ -254,14 +255,14 @@ CREATE TABLE "users" (
   "gender" genders NOT NULL,
   "picture" varchar(255),
   "current_address" uuid,
-  "last_update_datetime" timestamp DEFAULT (now())
+  "last_updated" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "user_settings" (
   "user" uuid PRIMARY KEY,
   "language" languages DEFAULT 'PT-BR',
   "displayed_currency" currencies DEFAULT 'USD',
-  "last_update_datetime" timestamp DEFAULT (now())
+  "last_updated" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "archived_cars" (
@@ -289,7 +290,7 @@ CREATE TABLE "archived_cars" (
   "propulsion" propulsion_types NOT NULL,
   "is_available" boolean,
   "default_picture" varchar(255),
-  "last_update_datetime" timestamp
+  "last_updated" timestamp
 );
 
 CREATE TABLE "archived_brands" (
@@ -298,7 +299,7 @@ CREATE TABLE "archived_brands" (
   "description" varchar(255),
   "country_origin" countries NOT NULL,
   "logo" varchar(255),
-  "last_update_datetime" timestamp
+  "last_updated" timestamp
 );
 
 CREATE TABLE "archived_stores" (
@@ -306,13 +307,13 @@ CREATE TABLE "archived_stores" (
   "name" varchar(255) NOT NULL,
   "address" uuid,
   "cnpj" varchar(14) UNIQUE NOT NULL,
-  "email" varchar(150) NOT NULL,
+  "email" varchar(150) UNIQUE NOT NULL,
   "phone_number" varchar(11),
   "website" varchar(255),
   "description" varchar(255),
   "owner" uuid NOT NULL,
   "is_active" boolean NOT NULL,
-  "last_update_datetime" timestamp
+  "last_updated" timestamp
 );
 
 CREATE TABLE "archived_addresses" (
@@ -335,7 +336,7 @@ CREATE TABLE "system_info" (
 CREATE TABLE "conversion_rate" (
   "currency" currencies PRIMARY KEY,
   "rate" decimal(5,2),
-  "last_update_datetime" timestamp
+  "last_updated" timestamp
 );
 
 ALTER TABLE "cars" ADD FOREIGN KEY ("brand") REFERENCES "brands" ("id");
@@ -346,9 +347,9 @@ ALTER TABLE "stores" ADD FOREIGN KEY ("address") REFERENCES "addresses" ("id");
 
 ALTER TABLE "stores" ADD FOREIGN KEY ("owner") REFERENCES "users" ("id");
 
-ALTER TABLE "shipping" ADD FOREIGN KEY ("shipping_address") REFERENCES "archived_addresses" ("id");
+ALTER TABLE "shippings" ADD FOREIGN KEY ("shipping_address") REFERENCES "archived_addresses" ("id");
 
-ALTER TABLE "shipping" ADD FOREIGN KEY ("order") REFERENCES "orders" ("id");
+ALTER TABLE "shippings" ADD FOREIGN KEY ("order") REFERENCES "orders" ("id");
 
 ALTER TABLE "favorite_cars" ADD FOREIGN KEY ("user") REFERENCES "users" ("id");
 
