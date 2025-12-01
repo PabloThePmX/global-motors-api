@@ -19,7 +19,7 @@ import br.com.globalmotors.cars_service.entities.dtos.StoreRequestDTO;
 import br.com.globalmotors.cars_service.repositories.StoreRepo;
 
 @RestController
-@RequestMapping("cars/store")
+@RequestMapping("cars/stores")
 public class StoreController {
 	
 	private final StoreRepo repo;

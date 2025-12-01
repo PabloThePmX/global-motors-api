@@ -130,14 +130,14 @@ app.MapPost("/users/user-favorites", async ([FromBody] FavoriteCar favoriteCar) 
 })
 .WithTags("User Favorites");
 
-app.MapDelete("/users/user-favorites/{userId}/{carroId}", async ([FromRoute] Guid userId, [FromRoute] Guid carroId) =>
+app.MapDelete("/users/user-favorites/{userId}/{carId}", async ([FromRoute] Guid userId, [FromRoute] Guid carId) =>
 {
-    var favoriteCar = await context.FavoriteCars.FindAsync(userId, carroId);
+    var favoriteCar = await context.FavoriteCars.FindAsync(userId, carId);
 
     if (favoriteCar == null)
         return Results.NotFound();
 
-    if (favoriteCar.User != userId || favoriteCar.Car != carroId)
+    if (favoriteCar.User != userId || favoriteCar.Car != carId)
         return Results.BadRequest();
 
     context.FavoriteCars.Remove(favoriteCar);

@@ -2,7 +2,7 @@ package br.com.globalmotors.currencies_service.models;
 
 public class Currency {
 	
-	public static enum currencies {
+	public static enum Currencies {
 		USD,
 		EUR,
 		BRL

@@ -42,7 +42,7 @@ public class CarImageController {
 				.filter(list -> !list.isEmpty())
 				.orElseThrow (() -> new Exception ("Carro não encontrado ou sem imagens disponíveis."));
 		
-		return ResponseEntity.ok(images);
+		return ResponseEntity.ok(images); 
 	}
 	
 	@GetMapping("/{carId}/{imageId}")

@@ -2,13 +2,9 @@ package br.com.globalmotors.currencies_service.entities;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
-
-import br.com.globalmotors.currencies_service.models.Currency.currencies;
+import br.com.globalmotors.currencies_service.models.Currency.Currencies;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
@@ -20,16 +16,12 @@ import jakarta.persistence.Transient;
 public class ExchangeRateEntity {
 	
 	@Id
-    @Enumerated
-    @JdbcType(PostgreSQLEnumJdbcType.class)
 	@Column(name= "currency_source")
-	private currencies currencySource;
+	private Currencies currencySource;
 	
 	@Id
-    @Enumerated
-    @JdbcType(PostgreSQLEnumJdbcType.class)
 	@Column(name= "currency_target")
-	private currencies currencyTarget;
+	private Currencies currencyTarget;
 	
 	@Column(name= "rate")
 	private double rate ;
@@ -53,19 +45,19 @@ public class ExchangeRateEntity {
 		this.dataSource = dataSource;
 	}
 
-	public currencies getCurrencySource() {
+	public Currencies getCurrencySource() {
 		return currencySource;
 	}
 
-	public void setCurrencySource(currencies currencySource) {
+	public void setCurrencySource(Currencies currencySource) {
 		this.currencySource = currencySource;
 	}
 
-	public currencies getCurrencyTarget() {
+	public Currencies getCurrencyTarget() {
 		return currencyTarget;
 	}
 
-	public void setCurrencyTarget(currencies currencyTarget) {
+	public void setCurrencyTarget(Currencies currencyTarget) {
 		this.currencyTarget = currencyTarget;
 	}
 

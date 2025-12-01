@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,23 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.globalmotors.currencies_service.clients.CurrencyBCClient;
 import br.com.globalmotors.currencies_service.clients.CurrencyBCResponse;
 import br.com.globalmotors.currencies_service.entities.ExchangeRateEntity;
-import br.com.globalmotors.currencies_service.models.Currency.currencies;
+import br.com.globalmotors.currencies_service.models.Currency.Currencies;
 import br.com.globalmotors.currencies_service.repository.CurrencyRepo;
 
 @RestController
 @RequestMapping("currencies")
-public class CurrenciesController {
+public class CurrencyController {
 	
 	private final CurrencyBCClient currencyBcClient;
 	private final CurrencyRepo repository; 
 	private final CacheManager cacheManager;
 	
-	@Value("${server.port}")
-	private int serverPort;
-	
 	private LocalDateTime conversionDate; 
 	
-	public CurrenciesController(CurrencyRepo repository, CurrencyBCClient currencyBcClient, CacheManager cacheManager){
+	public CurrencyController(CurrencyRepo repository, CurrencyBCClient currencyBcClient, CacheManager cacheManager){
 		this.repository = repository;
 		this.currencyBcClient = currencyBcClient;
 		this.cacheManager = cacheManager;
@@ -52,6 +49,9 @@ public class CurrenciesController {
 		String nameCache = "Currency";
 		String keyCache = source + target;
 		
+		if(!EnumUtils.isValidEnum(Currencies.class, source) || !EnumUtils.isValidEnum(Currencies.class, target))
+			throw new Exception("Moeda sem suporte.");
+		
 		ExchangeRateEntity conversionRate = cacheManager.getCache(nameCache).get(keyCache, ExchangeRateEntity.class);
 		
 		if(conversionRate != null) {
@@ -67,13 +67,13 @@ public class CurrenciesController {
 			dataSource = "API BCB";
 			conversionRate.setLastUpdated(conversionDate);
 		} catch (Exception e) {
-			conversionRate = repository.findByCurrencySourceAndCurrencyTarget(currencies.valueOf(source) ,currencies.valueOf(target))
-					.orElseThrow(() -> new Exception("Currency not supported!"));
+			conversionRate = repository.findByCurrencySourceAndCurrencyTarget(Currencies.valueOf(source), Currencies.valueOf(target))
+					.orElseThrow(() -> new Exception("Moeda sem suporte."));
 			dataSource = "Local Database";
 		}
 		
-		conversionRate.setCurrencySource(currencies.valueOf(source));
-		conversionRate.setCurrencyTarget(currencies.valueOf(target));
+		conversionRate.setCurrencySource(Currencies.valueOf(source));
+		conversionRate.setCurrencyTarget(Currencies.valueOf(target));
 		conversionRate.setDataSource(dataSource);
 		conversionRate.setConvertedValue(value * conversionRate.getRate());
 		
@@ -100,7 +100,7 @@ public class CurrenciesController {
 			response = currencyBcClient.getCurrency(currency, dateString);
 			
 			if(daysAgo >= 4)
-				throw new Exception("Unable to get conversion rate from BC.");
+				throw new Exception("Não foi possível se comuinicar com a api do Banco Central.");
 			
 			daysAgo++;
 		}
