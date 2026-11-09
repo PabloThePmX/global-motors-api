@@ -13,11 +13,22 @@ public class ApiGatewayConfig {
 	        return builder.routes()
 	                .route("cars-service", r -> r
 	                        .path("/cars/**")
-	                        .uri("http://localhost:8081/cars"))
+	                        .uri("lb://cars-service"))
+	                .route("currencies-service", r -> r
+	                        .path("/currencies/**")
+	                        .uri("lb://currencies-service"))
+	                .route("addresses-service", r -> r
+	                        .path("/addresses/**")
+	                        .uri("lb://addresses-service"))
+	                .route("auth-service", r -> r
+	                        .path("/auth/**")
+	                        .uri("lb://auth-service"))
+	                .route("orders-service", r -> r
+	                        .path("/orders/**")
+	                        .uri("lb://orders-service"))
 	                .route("user-service", r -> r
 	                        .path("/users/**")
-	                        //TODO pablo colocar a URL do users.
-	                        .uri("http://localhost:8082")) // URL do microserviço de usuários
+	                        .uri("lb://users-service"))
 	                .build();
 	    }
 }
