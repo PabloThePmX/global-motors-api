@@ -13,7 +13,7 @@
         <mxCell id="pBhr9esLD3eDXSHwliFh-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" parent="1" source="pBhr9esLD3eDXSHwliFh-2" target="pBhr9esLD3eDXSHwliFh-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="pBhr9esLD3eDXSHwliFh-2" value="Discovey" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="pBhr9esLD3eDXSHwliFh-2" value="Discovery" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="395" y="280" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="pYRqNGxVn8pnNeM_t1RV-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fillColor=#1ba1e2;strokeColor=#006EAF;" parent="1" source="pBhr9esLD3eDXSHwliFh-9" target="pYRqNGxVn8pnNeM_t1RV-3" edge="1">

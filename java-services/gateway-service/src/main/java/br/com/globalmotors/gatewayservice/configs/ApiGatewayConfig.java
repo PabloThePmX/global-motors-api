@@ -26,7 +26,7 @@ public class ApiGatewayConfig {
 	                .route("orders-service", r -> r
 	                        .path("/orders/**")
 	                        .uri("lb://orders-service"))
-	                .route("user-service", r -> r
+	                .route("users-service", r -> r
 	                        .path("/users/**")
 	                        .uri("lb://users-service"))
 	                .build();

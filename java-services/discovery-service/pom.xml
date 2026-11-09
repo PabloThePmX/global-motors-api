@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com.global-motors</groupId>
-	<artifactId>discovey-service</artifactId>
+	<artifactId>discovery-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>discovey-service</name>
+	<name>discovery-service</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
