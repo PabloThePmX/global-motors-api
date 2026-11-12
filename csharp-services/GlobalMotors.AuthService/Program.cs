@@ -2,16 +2,12 @@ using GlobalMotors.AuthService.Context;
 using GlobalMotors.AuthService.Models;
 using GlobalMotors.AuthService.Models.DTOs;
 using GlobalMotors.AuthService.Models.Enums;
-using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.IdentityModel.Tokens.Experimental;
 using Microsoft.OpenApi.Models;
 using Steeltoe.Discovery.Client;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
@@ -89,21 +85,25 @@ app.MapPost("auth/signin", async ([FromBody] LoginUser loginUser) =>
     if (!BCrypt.Net.BCrypt.Verify(loginUser.Password, user.Password))
         return Results.BadRequest("Wrong password.");
 
-    var jwt = CreateToken(loginUser, user.Role);
+    var jwt = CreateToken(loginUser, user.Id, user.Role);
 
     return Results.Ok(jwt);
 })
 .WithTags("Auth");
 
-app.MapPost("auth/validate-jwt", ([FromBody] string jwt) =>
+app.MapPost("auth/validate-jwt", async ([FromBody] string jwt) =>
 {
-    var claimsPrincipal = ValidateToken(jwt);
+    var result = await ValidateTokenAsync(jwt);
 
-    if (claimsPrincipal == null)
+    if (!result.IsValid)
         return Results.Unauthorized();
 
-    return Results.Ok(claimsPrincipal.Claims.Where(c => 
-        c.Type.Contains("name") || c.Type.Contains("role")).Select(c => new { c.Type, c.Value} ));
+    var claims = result.Claims;
+
+    return Results.Ok(new TokenClaimsDTO(
+        Id: (string)claims["id"],
+        Type: (string)claims["type"],
+        Email: (string)claims["email"]));
 })
 .WithTags("Auth");
 
@@ -140,33 +140,28 @@ app.MapPut("auth/users/{userId}", async ([FromRoute] Guid userId, [FromBody] Use
 
 #endregion
 
-string CreateToken(LoginUser user, UserRoles role)
+string CreateToken(LoginUser user, Guid id, UserRoles role)
 {
-    List<Claim> claims = new List<Claim> {
-        new Claim(ClaimTypes.Name, user.Email),
-        new Claim(ClaimTypes.Role, role.ToString())
+    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("_chave_SecretaGlobalMotors_chave_"));
+
+    var descriptor = new SecurityTokenDescriptor
+    {
+        Claims = new Dictionary<string, object>
+        {
+            ["id"] = id.ToString(),
+            ["type"] = ((int)role).ToString(),
+            ["email"] = user.Email
+        },
+        Expires = DateTime.UtcNow.AddDays(1),
+        SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
     };
 
-    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("_chave_SecretaGlobalMotors_chave_"));
-
-    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-    var token = new JwtSecurityToken(
-        claims: claims,
-        expires: DateTime.UtcNow.AddDays(1),
-        signingCredentials: creds
-    );
-
-    var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-    return jwt;
+    return new JsonWebTokenHandler().CreateToken(descriptor);
 }
 
-ClaimsPrincipal? ValidateToken(string jwt)
+async Task<TokenValidationResult> ValidateTokenAsync(string jwt)
 {
     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("_chave_SecretaGlobalMotors_chave_"));
-
-    var tokenHandler = new JwtSecurityTokenHandler();
 
     var validationParameters = new TokenValidationParameters
     {
@@ -177,16 +172,7 @@ ClaimsPrincipal? ValidateToken(string jwt)
         ValidateAudience = false    
     };
 
-    try
-    {
-        SecurityToken validatedToken;
-        return tokenHandler.ValidateToken(jwt, validationParameters, out validatedToken);
-    } 
-    catch (Exception e)
-    {
-        return null;
-    }
-
+    return await new JsonWebTokenHandler().ValidateTokenAsync(jwt, validationParameters);
 }
 
 User MapDtoToUser(UserRequestDTO user) => new User()
