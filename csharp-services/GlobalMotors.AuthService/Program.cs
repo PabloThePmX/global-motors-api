@@ -23,11 +23,20 @@ builder.Services.AddSwaggerGen(opt =>
     {
         Version = "v1",
         Title = "Auth Service",
-        Description = "Documentação da API do Microsserviço Auth, contendo rotas para Register e Login, bem como alterções nas informações do usuário.",
+        Description = "DocumentaÃ§Ã£o da API do MicrosserviÃ§o Auth, contendo rotas para Register e Login, bem como alterÃ§Ãµes nas informaÃ§Ãµes do usuÃ¡rio.",
     });
 
     opt.EnableAnnotations();
     opt.UseInlineDefinitionsForEnums();
+
+    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Cole apenas o JWT retornado por /auth/signin (sem 'Bearer ')."
+    });
 
 });
 
@@ -93,7 +102,7 @@ app.MapPost("auth/signin", async ([FromBody] LoginUser loginUser) =>
 
 app.MapPost("auth/validate-jwt", async ([FromHeader(Name = "Authorization")] string? authorization) =>
 {
-    //Verifica se o Bearer de atuh existe, se sim, remove para pegar o jwt e validar
+    //Verifica se o Bearer de auth existe, se sim, remove para pegar o jwt e validar
     const string prefix = "Bearer ";
 
     if (string.IsNullOrWhiteSpace(authorization) ||
@@ -102,6 +111,40 @@ app.MapPost("auth/validate-jwt", async ([FromHeader(Name = "Authorization")] str
 
     var jwt = authorization[prefix.Length..].Trim();
 
+    var result = await ValidateTokenAsync(jwt);
+
+    if (!result.IsValid)
+        return Results.Unauthorized();
+
+    var claims = result.Claims;
+
+    return Results.Ok(new TokenClaimsDTO(
+        Id: (string)claims["id"],
+        Type: (string)claims["type"],
+        Email: (string)claims["email"]));
+})
+.WithTags("Auth")
+.WithOpenApi(op =>
+{
+    //o swagger ignora o header Authorization como parÃ¢metro; ele Ã© enviado pelo esquema Bearer (botÃ£o Authorize)
+    op.Parameters = op.Parameters
+        .Where(p => !(p.In == ParameterLocation.Header && p.Name == "Authorization"))
+        .ToList();
+
+    op.Security.Add(new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecurityScheme
+        {
+            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+        }] = Array.Empty<string>()
+    });
+
+    return op;
+});
+
+//endpoint anterior, com o jwt direto no body
+app.MapPost("auth/validate-jwt-legacy", async ([FromBody] string jwt) =>
+{
     var result = await ValidateTokenAsync(jwt);
 
     if (!result.IsValid)
