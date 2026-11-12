@@ -14,20 +14,23 @@ public class ApiGatewayConfig {
 	                .route("cars-service", r -> r
 	                        .path("/cars/**")
 	                        .uri("lb://cars-service"))
+	                .route("cars-service", r -> r
+	                        .path("/ws/cars/**")
+	                        .uri("lb://cars-service"))
 	                .route("currencies-service", r -> r
 	                        .path("/currencies/**")
 	                        .uri("lb://currencies-service"))
 	                .route("addresses-service", r -> r
-	                        .path("/addresses/**")
+	                        .path("/ws/addresses/**")
 	                        .uri("lb://addresses-service"))
 	                .route("auth-service", r -> r
 	                        .path("/auth/**")
 	                        .uri("lb://auth-service"))
 	                .route("orders-service", r -> r
-	                        .path("/orders/**")
+	                        .path("/ws/orders/**")
 	                        .uri("lb://orders-service"))
 	                .route("users-service", r -> r
-	                        .path("/users/**")
+	                        .path("/ws/users/**")
 	                        .uri("lb://users-service"))
 	                .build();
 	    }

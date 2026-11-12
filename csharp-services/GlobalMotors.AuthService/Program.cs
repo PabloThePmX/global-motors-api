@@ -91,8 +91,17 @@ app.MapPost("auth/signin", async ([FromBody] LoginUser loginUser) =>
 })
 .WithTags("Auth");
 
-app.MapPost("auth/validate-jwt", async ([FromBody] string jwt) =>
+app.MapPost("auth/validate-jwt", async ([FromHeader(Name = "Authorization")] string? authorization) =>
 {
+    //Verifica se o Bearer de atuh existe, se sim, remove para pegar o jwt e validar
+    const string prefix = "Bearer ";
+
+    if (string.IsNullOrWhiteSpace(authorization) ||
+        !authorization.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+        return Results.Unauthorized();
+
+    var jwt = authorization[prefix.Length..].Trim();
+
     var result = await ValidateTokenAsync(jwt);
 
     if (!result.IsValid)
